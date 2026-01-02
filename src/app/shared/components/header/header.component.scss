@@ -1,0 +1,23 @@
+.ion-title-passbook {
+  display: flex;
+  margin: 5px 0 0 10px;
+  width: 310px;
+
+  .material-symbols-outlined {
+    float: left;
+    margin-top: 5px;
+    font-size: 35px;
+  }
+
+  img {
+    position: absolute;
+    margin-left: 35px;
+  }
+
+  p {
+    position: relative;
+    margin-top: 30px;
+    right: 2%;
+    font-family: 'Montserrat', sans-serif;
+  }
+}

@@ -1,0 +1,73 @@
+<app-header />
+
+<ion-content [fullscreen]="true">
+  <div class="flex flex-col justify-center items-center mt-8">
+
+    <div class="text-center mb-8">
+      <div class="bg-blue-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+        <ion-icon name="key" color="xionico" class="text-5xl"></ion-icon>
+      </div>
+      <h1 class="text-3xl font-extrabold tracking-tight" style="color:var(--ion-xionico-color);">INGRESO</h1>
+      <p class="text-gray-500 text-sm mt-2">Bienvenido, accede a tu panel</p>
+    </div>
+
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-6 border border-gray-100">
+      <form [formGroup]="loginForm" (ngSubmit)="submit()" class="space-y-4">
+
+        <div class="space-y-1">
+          <app-custom-input [isPassword]="false" [inputLabel]="'E-mail'" [inputType]="'email'" [iconName]="'mail-outline'"
+            [formControlValue]="loginForm.controls.email" />
+
+          @if(loginForm.controls.email.errors && loginForm.controls.email.touched){
+            <app-validator-form [message]="'Correo requerido'" [showMessage]="loginForm.controls.email.errors['required']" [slot]="'start'" />
+            <app-validator-form [message]="'Formato de correo no válido'" [showMessage]="loginForm.controls.email.errors['email']" [slot]="'start'" />
+          }
+        </div>
+
+        <div class="space-y-1">
+          <app-custom-input [isPassword]="true" [inputLabel]="'Contraseña'" [inputType]="'password'"
+            [iconName]="'lock-closed-outline'" [formControlValue]="loginForm.controls.password" />
+
+          @if (loginForm.controls.password.errors && loginForm.controls.password.touched) {
+            <app-validator-form [message]="'Contraseña requerida'" [showMessage]="loginForm.controls.password.errors['required']" [slot]="'start'" />
+          }
+        </div>
+
+        <div class="text-right">
+          <ion-button fill="clear" color="medium" size="small" class="text-xs lowercase">
+            ¿Olvidaste tu contraseña?
+          </ion-button>
+        </div>
+
+        <div class="pt-4 flex flex-col gap-3">
+          <ion-button type="submit" expand="block" color="xionico" mode="md" [disabled]="loginForm.invalid" class="h-12 font-bold shadow-md">
+            <ion-icon slot="start" name="log-in-outline" class="mr-2"></ion-icon>
+            Ingresar
+          </ion-button>
+
+          <div class="flex items-center my-2">
+            <div class="flex-grow h-px bg-gray-100"></div>
+            <span class="px-3 text-gray-400 text-xs uppercase">o</span>
+            <div class="flex-grow h-px bg-gray-100"></div>
+          </div>
+
+          <ion-button expand="block" fill="outline" color="primary" mode="md" (click)="register()" class="h-12 font-semibold">
+            <ion-icon slot="start" name="person-add-outline" class="mr-2"></ion-icon>
+            Solicitar cuenta
+          </ion-button>
+        </div>
+
+      </form>
+    </div>
+
+    @if(fingerPrint()){
+      <div class="mt-12 flex flex-col items-center animate-bounce">
+        <ion-button fill="clear">
+          <ion-icon name="finger-print-outline" class="text-6xl" color="xionico"></ion-icon>
+        </ion-button>
+        <p class="text-xs text-gray-400 font-medium mt-2">Ingreso biométrico</p>
+      </div>
+    }
+
+  </div>
+</ion-content>

@@ -1,0 +1,54 @@
+.scroll-container {
+  max-height: 750px;
+  overflow-y: auto;
+}
+
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ion-color-xionico) #f4f4f4;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--ion-color-xionico);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f4f4f4;
+  }
+}
+
+.custom-searchbar {
+  --box-shadow: none;
+  --border-radius: 10px;
+  padding-top: 0;
+}
+
+ion-segment {
+  --background: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+ion-segment-button {
+  color: #ffffff !important;
+  --color: #ffffff !important;
+
+  --color-checked: #0088cc !important;
+
+  --indicator-color: #ffffff !important;
+
+  min-height: 32px;
+  font-weight: 500;
+}
+
+ion-segment-button.segment-button-checked {
+  ion-label {
+    color: #0088cc !important;
+    font-weight: bold;
+  }
+}

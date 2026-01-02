@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+:root {
+  --ion-xionico-color: #0ea5e9;
+  --white-soft: #ffffff;
+  --ion-xionico-gradient: linear-gradient(135deg, var(--ion-xionico-color:) 20%, var(--white-soft) 80%);
+}
+
+.ion-color-xionico {
+  --ion-color-base: var(--ion-xionico-color);
+  --ion-color-contrast: #ffffff;
+  --ion-color-shade: #0b83c1;
+  --ion-color-tint: #29b0ff;
+}

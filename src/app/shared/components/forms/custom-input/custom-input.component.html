@@ -1,0 +1,9 @@
+<ion-item class="mx-auto w-[90%]">
+  <ion-icon slot="start" [name]=iconName() color="xionico" class="pr-[10px]"/>
+  <ion-input [type]="inputType" [label]=inputLabel() labelPlacement="floating" [formControl]="formControlValue()" color="xionico"/>
+  @if (isPassword()) {
+  <ion-button (click)="showHidePassword()" slot="end" fill="clear" shape="round">
+    <ion-icon slot="icon-only" [name]="hide ? 'eye-outline' : 'eye-off-outline'" size="large" color="xionico"></ion-icon>
+  </ion-button>
+  }
+</ion-item>

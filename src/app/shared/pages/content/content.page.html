@@ -1,0 +1,60 @@
+<app-header />
+
+<ion-content class="bg-gray-50">
+  <div class="p-4 lg:p-6">
+
+    <section class="bg-gradient-to-r from-(--ion-xionico-color) to-blue-700 rounded-t-3xl p-6 shadow-lg text-white">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-md">
+          <ion-icon name="business-outline" class="text-3xl"></ion-icon>
+        </div>
+        <div>
+          <h1 class="text-3xl font-black m-0 tracking-tight">MURIEL</h1>
+          <p class="text-blue-100 text-xs uppercase tracking-widest font-bold opacity-80">Panel de Control Central</p>
+        </div>
+      </div>
+
+      <div class="flex">
+    <ion-segment [value]="selectedServerId()"
+                 (ionChange)="selectedServerId.set($any($event).detail.value)"
+                 mode="ios"
+                 class="pill-segment">
+      @for (server of serversList(); track server.id) {
+        <ion-segment-button [value]="server.id">
+          <ion-label>ID: {{ server.nombreServidor }}</ion-label>
+        </ion-segment-button>
+      }
+    </ion-segment>
+  </div>
+    </section>
+
+    <div class="bg-white rounded-b-3xl p-6 shadow-xl border-x border-b border-gray-100">
+      @if (activeServer(); as data) {
+        <ion-grid class="ion-no-padding">
+          <ion-row class="gap-6">
+
+            <ion-col size="12" size-lg="7">
+              <app-cards
+                [title]="'Servicios'"
+                [type]="'services'"
+                [serverData]="data"
+                [colNames]="['Favorito', 'Nombre', 'Estado', 'Acción']"
+                [DISTRIBUIDORA_ID]="data.nombreDistribuidora"
+                [SERVER_ID]="data.nombreServidor" />
+            </ion-col>
+
+            <ion-col size="12" size-lg="">
+              <div class="flex flex-col gap-6">
+                <app-cards [title]="'Hardware'" [type]="'hardware'" [hardware]="data.hardware" />
+                <app-cards [title]="'Salud Almacenamiento'" [type]="'disk'" [disks]="data.disk_status" />
+                <app-cards [title]="'Backups'" [type]="'backups'" [backups]="data.backups.lastBackups" />
+              </div>
+            </ion-col>
+
+          </ion-row>
+        </ion-grid>
+      }
+    </div>
+
+  </div>
+</ion-content>

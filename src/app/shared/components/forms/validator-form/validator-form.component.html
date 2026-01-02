@@ -1,0 +1,8 @@
+<div class="mx-auto mt-2 font-bold text-red-700">
+  @if (showMessage()) {
+  <div class="flex items-center justify-center">
+    <ion-icon [slot]=slot() name="alert-circle-outline" color="red" size="large"></ion-icon>
+    {{message()}}
+  </div>
+  }
+</div>

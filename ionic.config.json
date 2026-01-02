@@ -1,0 +1,7 @@
+{
+  "name": "wiki-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

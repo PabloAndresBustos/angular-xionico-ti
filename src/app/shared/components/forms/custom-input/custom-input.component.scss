@@ -1,0 +1,10 @@
+.customInput{
+    width: 80%;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .customInput{
+        width: 100%;
+    }
+}
