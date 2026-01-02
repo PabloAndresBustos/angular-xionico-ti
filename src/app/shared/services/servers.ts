@@ -16,6 +16,10 @@ import {
   setDoc,
   Firestore,
   getDoc,
+  QueryDocumentSnapshot,
+  QuerySnapshot,
+  DocumentData,
+  collectionGroup,
 } from 'firebase/firestore';
 import {
   Auth,
@@ -34,9 +38,6 @@ export class Servers implements OnDestroy {
   private auth = getAuth(this.app);
   private unsubscribeList: Unsubscribe | null = null;
 
-  /* DISTRIBUIDORA_ID = 'Logistica Zona Sur';
-  SERVER_ID = 'SERVER01'; */
-
   allServersData = signal<any[]>([]);
   authService = signal<User | null>(null);
 
@@ -45,23 +46,44 @@ export class Servers implements OnDestroy {
   }
 
   private listenToAuthChanges() {
-    onAuthStateChanged(this.auth, async (dbUser) => {
-      if (dbUser) {
-        const userData = doc(this.db, `users/${dbUser.uid}`);
-        const userSnap = await getDoc(userData);
+  onAuthStateChanged(this.auth, async (dbUser) => {
+    if (dbUser) {
+      const userData = doc(this.db, `users/${dbUser.uid}`);
+      const userSnap = await getDoc(userData);
 
-        if (userSnap.exists()) {
-          const profile = userSnap.data() as User;
-          this.authService.set(profile);
-          const distId =
-            profile.distribuidoraAsignada || profile.distribuidoraObjetivo;
+      if (userSnap.exists()) {
+        const profile = userSnap.data() as User;
+        this.authService.set(profile);
+
+        // CAMBIO AQUÍ: Si es Admin/Soporte, necesitamos una escucha diferente
+        if (profile.role === 0 || profile.role === 1) {
+          this.listenToAllServersAdmin();
+        } else {
+          const distId = profile.distribuidoraAsignada || profile.distribuidoraObjetivo;
           this.listenToServersRealTime(distId);
         }
-      } else {
-        this.authService.set(null);
       }
-    });
-  }
+    } else {
+      this.authService.set(null);
+    }
+  });
+}
+
+private listenToAllServersAdmin() {
+  if (this.unsubscribeList) this.unsubscribeList();
+
+  // Cambiamos el require por una referencia directa si es posible,
+  // o tipamos manualmente los argumentos del snapshot
+  const q = query(collectionGroup(this.db, 'servidores'));
+
+  this.unsubscribeList = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
+    const data = snapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    this.allServersData.set(data);
+  });
+}
 
   private listenToServersRealTime(distribuidoraId: string) {
     if (this.unsubscribeList) this.unsubscribeList();
@@ -88,7 +110,8 @@ export class Servers implements OnDestroy {
     if (!user || !user.approved) return [];
 
     const filteredData = allData.filter((server) => {
-      if (user.role === ROLES.admin || user.role === ROLES.support) {
+
+      if (user.role === 0 || user.role === 1) {
         return true;
       }
 
@@ -97,6 +120,7 @@ export class Servers implements OnDestroy {
       const isAllowedBranch = (user.sucursales || []).includes(
         server.nombreServidor
       );
+
       return isSameDist && isAllowedBranch;
     });
 
@@ -105,7 +129,6 @@ export class Servers implements OnDestroy {
       const mappedServices = (server.services || []).map((s: any) => {
         const isRecommended =
           s.recommended === true || recommendedIds.includes(s.id || s.name);
-
         return {
           ...s,
           id: s.id,
@@ -127,7 +150,12 @@ export class Servers implements OnDestroy {
     });
   });
 
-  async selectRecommended(distribuidoraId: string, serverId:string, serviceId: string, isRecommended: boolean) {
+  async selectRecommended(
+    distribuidoraId: string,
+    serverId: string,
+    serviceId: string,
+    isRecommended: boolean
+  ) {
     const path = `distribuidoras/${distribuidoraId}/servidores/${serverId}`;
     const serverDoc = doc(this.db, path);
 
@@ -166,7 +194,7 @@ export class Servers implements OnDestroy {
       approved: false,
       distribuidoraAsignada: '',
       distribuidoraObjetivo: user.distribuidoraObjetivo,
-      sucursales: []
+      sucursales: [],
     };
 
     await this.emailSender(user, uid);
