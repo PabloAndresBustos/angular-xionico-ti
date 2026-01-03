@@ -1,54 +1,103 @@
-.scroll-container {
-  max-height: 750px;
-  overflow-y: auto;
-}
-
-.custom-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: var(--ion-color-xionico) #f4f4f4;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--ion-color-xionico);
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f4f4f4;
-  }
+:host {
+  --ion-xionico-color: #3880ff;
 }
 
 .custom-searchbar {
-  --box-shadow: none;
-  --border-radius: 10px;
-  padding-top: 0;
+  --border-radius: 12px;
+  --background: #f4f5f8;
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.scroll-container {
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+.service-item {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --inner-padding-end: 0;
+  transition: background-color 0.2s ease;
+
+  ion-label {
+    white-space: normal !important;
+    word-break: break-word;
+    color: #1a1a1a;
+  }
+}
+
+.bg-gray-50 {
+  background-color: #f8f9fa;
+  border: 1px solid #edf0f2;
+}
+
+ion-icon[name="ellipse"],
+ion-icon[name="checkmark-circle"],
+ion-icon[name="alert-circle"] {
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.1));
+}
+
+ion-button {
+  &.h-9 {
+    --border-radius: 8px;
+    height: 36px;
+    margin: 0;
+
+    ion-icon {
+      font-size: 1.2rem;
+    }
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+  }
 }
 
 ion-segment {
-  --background: rgba(0, 0, 0, 0.15);
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.15) !important;
   border-radius: 8px;
-  padding: 2px;
+
+  ion-segment-button {
+    --indicator-color: #ffffff;
+    --color: #ffffff;
+    --color-checked: var(--ion-xionico-color);
+    min-height: 30px;
+
+    ion-label {
+      font-weight: 600;
+    }
+  }
 }
 
-ion-segment-button {
-  color: #ffffff !important;
-  --color: #ffffff !important;
-
-  --color-checked: #0088cc !important;
-
-  --indicator-color: #ffffff !important;
-
-  min-height: 32px;
-  font-weight: 500;
+ion-progress-bar {
+  height: 10px;
+  border-radius: 10px;
+  --background: #ebebeb;
 }
 
-ion-segment-button.segment-button-checked {
-  ion-label {
-    color: #0088cc !important;
-    font-weight: bold;
+.custom-scroll {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
+}
+
+@media (max-width: 360px) {
+  .ml-8 {
+    margin-left: 0 !important;
+  }
+
+  .text-sm {
+    font-size: 12px !important;
   }
 }
