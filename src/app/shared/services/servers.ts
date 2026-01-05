@@ -271,7 +271,7 @@ export class Servers implements OnDestroy {
 
   async deleteUser(userId:string){
     const functions = getFunctions();
-    const deleteUserFn = httpsCallable(functions, 'deleteAuthUser');
+    const deleteUserFn = httpsCallable(functions, 'deleteUserAuth');
 
     try {
       await deleteUserFn({uid: userId});
