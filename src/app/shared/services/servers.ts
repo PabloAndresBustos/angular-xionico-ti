@@ -187,23 +187,25 @@ export class Servers implements OnDestroy {
     const userDoc = await getDoc(doc(getFirestore(), 'users', userId));
 
     if (userDoc.exists()) {
-      const userData = { user: userDoc.data() as User };
-      if (userData.user.approved) {
+      const userData = userDoc.data() as User;
+
+      if (userData.approved) {
         const availableBio = await this.biometric.isAvailalbe();
         const bioIsRegister = localStorage.getItem('xionico_auth_cred_id');
 
         if (availableBio && !bioIsRegister) {
-          await this.biometric.registerBio(userData.user.email);
-          localStorage.setItem(
-            'xionico_user_temp',
-            JSON.stringify(userData.user)
-          );
+          await this.biometric.registerBio(userData.email);
+          localStorage.setItem('xionico_user_temp', JSON.stringify(user));
         }
+
+        return userData;
       } else {
         this.router.navigateByUrl('/aprobation');
+        return null;
       }
     } else {
       this.viewSrv.toastPresent('Verifique usuario o contraseña', 'danger');
+      throw new Error('El perfil de usuario no existe en la base de datos');
     }
   }
 

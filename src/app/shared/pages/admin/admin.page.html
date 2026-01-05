@@ -1,5 +1,57 @@
 <app-header />
 
 <ion-content [fullscreen]="true">
+  <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-6 border border-gray-100">
+      <form [formGroup]="approvedForm" (ngSubmit)="submit()" class="space-y-4">
 
+        <div class="space-y-1">
+          <app-custom-input [isPassword]="false" [inputLabel]="'E-mail'" [inputType]="'email'"
+            [iconName]="'mail-outline'" [formControlValue]="approvedForm.controls.email" />
+
+          @if(approvedForm.controls.email.errors && approvedForm.controls.email.touched){
+          <app-validator-form [message]="'Correo requerido'" [showMessage]="approvedForm.controls.email.errors['required']"
+            [slot]="'start'" />
+          <app-validator-form [message]="'Formato de correo no válido'"
+            [showMessage]="approvedForm.controls.email.errors['email']" [slot]="'start'" />
+          }
+        </div>
+
+        <div class="space-y-1">
+          <app-custom-input [isPassword]="true" [inputLabel]="'Contraseña'" [inputType]="'password'"
+            [iconName]="'lock-closed-outline'" [formControlValue]="approvedForm.controls.password" />
+
+          @if (approvedForm.controls.password.errors && approvedForm.controls.password.touched) {
+          <app-validator-form [message]="'Contraseña requerida'"
+            [showMessage]="approvedForm.controls.password.errors['required']" [slot]="'start'" />
+          }
+        </div>
+
+        <div class="text-right">
+          <ion-button fill="clear" color="medium" size="small" class="text-xs lowercase">
+            ¿Olvidaste tu contraseña?
+          </ion-button>
+        </div>
+
+        <div class="pt-4 flex flex-col gap-3">
+          <ion-button type="submit" expand="block" color="xionico" mode="md" [disabled]="approvedForm.invalid"
+            class="h-12 font-bold shadow-md">
+            <ion-icon slot="start" name="log-in-outline" class="mr-2"></ion-icon>
+            Ingresar
+          </ion-button>
+
+          <div class="flex items-center my-2">
+            <div class="flex-grow h-px bg-gray-100"></div>
+            <span class="px-3 text-gray-400 text-xs uppercase">o</span>
+            <div class="flex-grow h-px bg-gray-100"></div>
+          </div>
+
+          <ion-button expand="block" fill="outline" color="primary" mode="md"
+            class="h-12 font-semibold">
+            <ion-icon slot="start" name="person-add-outline" class="mr-2"></ion-icon>
+            Solicitar cuenta
+          </ion-button>
+        </div>
+
+      </form>
+    </div>
 </ion-content>

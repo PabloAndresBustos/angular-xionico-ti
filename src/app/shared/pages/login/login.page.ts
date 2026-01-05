@@ -66,14 +66,16 @@ export class LoginPage implements OnInit {
       const userLogin = this.loginForm.value as User;
 
       try {
-        await this.servers.singIn(userLogin).then((res) => {
+        const userData = await this.servers.singIn(userLogin);
+
+        if (userData) {
           this.viewSrv.toastPresent(
-            `Bienvenido ${userLogin.name.toUpperCase()}`,
+            `Bienvenido ${userData.name.toUpperCase()}`,
             'success'
           );
           this.viewSrv.isLogin.set(true);
           this.router.navigateByUrl('/content');
-        });
+        }
       } catch (err: any) {
         this.viewSrv.toastPresent(err.message || 'Error', 'danger');
       }
@@ -82,13 +84,33 @@ export class LoginPage implements OnInit {
 
   async authenUser() {
     const loginData = localStorage.getItem('xionico_user_temp');
-    if (!loginData) return;
+    if (!loginData) {
+      this.viewSrv.toastPresent('No hay credenciales registradas', 'warning');
+      return;
+    }
 
     const valid = await this.biometric.verify();
 
     if (valid) {
-      const user = JSON.parse(loginData);
-      await this.servers.singIn(user);
+      try {
+        const user = JSON.parse(loginData);
+
+        const userData = await this.servers.singIn(user);
+
+        if (userData) {
+          this.viewSrv.toastPresent(
+            `Acceso Biométrico: Bienvenido ${userData.name.toUpperCase()}`,
+            'success'
+          );
+          this.viewSrv.isLogin.set(true);
+          this.router.navigateByUrl('/content');
+        }
+      } catch (err: any) {
+        this.viewSrv.toastPresent(
+          'Error en la autenticación biométrica',
+          'danger'
+        );
+      }
     }
   }
 
