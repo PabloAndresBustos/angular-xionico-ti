@@ -1,9 +1,9 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { IonicElementsModule } from '../../modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from '../../modules/components/components-module';
 import { ViewServices } from '../../services/view-services';
 import { addIcons } from 'ionicons';
-import { logOutOutline, peopleOutline } from 'ionicons/icons';
+import { logOutOutline, peopleOutline, arrowBackOutline } from 'ionicons/icons';
 import { Servers } from '../../services/servers';
 import { Router } from '@angular/router';
 
@@ -19,10 +19,15 @@ export class HeaderComponent implements OnInit {
   private serversSrvc = inject(Servers);
   private router = inject(Router);
 
+  isAdminPanel(){
+    return this.viewSrv.isAdminPanel();
+  }
+
   constructor() {
     addIcons({
       logOutOutline,
       peopleOutline,
+      arrowBackOutline
     });
   }
 
@@ -43,6 +48,10 @@ export class HeaderComponent implements OnInit {
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
+  }
+
+  back(){
+    this.router.navigateByUrl('/content');
   }
 
   signOut() {

@@ -18,7 +18,14 @@
       @if (isLogin()) {
       <div class="flex justify-end">
         @if(adminOrSupport()){
-        <ion-button  fill="clear" (click)="admin()" class="logout-button hover:opacity-80 transition-opacity">
+        @if(isAdminPanel()){
+        <ion-button fill="clear" (click)="back()" class="logout-button hover:opacity-80 transition-opacity">
+          <div class="bg-red-600/20 p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
+            <ion-icon name="arrow-back-outline" class="text-white text-xl sm:text-2xl" slot="icon-only"></ion-icon>
+          </div>
+        </ion-button>
+        }
+        <ion-button fill="clear" (click)="admin()" class="logout-button hover:opacity-80 transition-opacity">
           <div class="bg-red-600/20 p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
             <span class="hidden md:inline text-white text-xs font-bold mr-1">Admin</span>
             <ion-icon name="people-outline" class="text-white text-xl sm:text-2xl"></ion-icon>

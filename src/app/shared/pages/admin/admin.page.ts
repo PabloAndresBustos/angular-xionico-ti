@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { IonicElementsModule } from '../../modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from '../../modules/components/components-module';
 import { CustomInputComponent } from '../../components/forms/custom-input/custom-input.component';
@@ -7,6 +7,7 @@ import { Servers } from '../../services/servers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IonBadge } from "@ionic/angular/standalone";
 import { SingUpUserComponent } from "../../components/forms/sing-up-user/sing-up-user.component";
+import { ViewServices } from '../../services/view-services';
 
 @Component({
   selector: 'app-admin',
@@ -15,8 +16,9 @@ import { SingUpUserComponent } from "../../components/forms/sing-up-user/sing-up
   standalone: true,
   imports: [IonicElementsModule, ComponentsModule, SingUpUserComponent],
 })
-export class AdminPage implements OnInit {
+export class AdminPage implements OnInit, OnDestroy {
   servers = inject(Servers);
+  private viewSrv = inject(ViewServices);
 
   constructor() {}
 
@@ -49,5 +51,11 @@ export class AdminPage implements OnInit {
     return this.servers.adminUser();
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.viewSrv.isAdminPanel.set(true)
+  }
+
+  ngOnDestroy(): void {
+    this.viewSrv.isAdminPanel.set(false)
+  }
 }

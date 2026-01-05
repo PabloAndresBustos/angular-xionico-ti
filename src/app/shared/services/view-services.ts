@@ -13,6 +13,7 @@ export class ViewServices {
   private toastController = inject(ToastController);
 
   public isLogin = signal<boolean>(false);
+  public isAdminPanel = signal<boolean>(false);
 
   async presentModal(opts: ModalOptions) {
     const modal = await this.modalController.create(opts);
