@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { ModalOptions } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular/standalone';
@@ -11,6 +11,8 @@ export class ViewServices {
   public isMobile: boolean = false;
   private modalController = inject(ModalController);
   private toastController = inject(ToastController);
+
+  public isLogin = signal<boolean>(false);
 
   async presentModal(opts: ModalOptions) {
     const modal = await this.modalController.create(opts);

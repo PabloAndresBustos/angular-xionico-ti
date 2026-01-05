@@ -64,7 +64,6 @@ export class RegisterPage implements OnInit {
         const newUser = await this.servers.register(user);
 
         await this.servers.createUser(user, newUser.user.uid).then((res) => {
-          console.log(res);
           this.servers.signOut();
           this.router.navigateByUrl('/aprobation');
         });

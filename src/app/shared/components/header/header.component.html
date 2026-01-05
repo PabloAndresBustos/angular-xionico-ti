@@ -15,7 +15,8 @@
         </p>
       </div>
 
-      <div class="flex justify-end">
+      @if (isLogin()) {
+        <div class="flex justify-end">
         <ion-button fill="clear" (click)="signOut()"
                     class="logout-button hover:opacity-80 transition-opacity">
           <div class="bg-red-600/20 p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
@@ -24,6 +25,8 @@
           </div>
         </ion-button>
       </div>
+      }
+
 
     </div>
   </ion-toolbar>

@@ -25,7 +25,6 @@ import {
   mailOutline,
 } from 'ionicons/icons';
 
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -62,35 +61,41 @@ export class LoginPage implements OnInit {
     password: new FormControl('', [Validators.required]),
   });
 
-  authenUser() {
-    return this.biometric.authenUser();
+  async submit() {
+    if (this.loginForm.valid) {
+      const userLogin = this.loginForm.value as User;
+
+      try {
+        await this.servers.singIn(userLogin);
+
+        const availableBio = await this.biometric.isAvailalbe();
+        const bioIsRegister = localStorage.getItem('xionico_auth_cred_id');
+
+        if (availableBio && !bioIsRegister) {
+          await this.biometric.registerBio(userLogin.email);
+          localStorage.setItem('xionico_user_temp', JSON.stringify(userLogin));
+        }
+      } catch (err: any) {
+        this.viewSrvc.toastPresent(err.message || 'Error', 'danger');
+      }
+    }
   }
 
-  submit() {
-    if (this.loginForm.valid) {
-      this.servers
-        .singIn(this.loginForm.value as User)
-        .then((res) => {
-          const userData = res.user;
-          if (userData.approved) {
-            this.viewSrvc.toastPresent(`Bienvenido ${userData.name.toUpperCase()}`, 'success');
-            this.router.navigateByUrl('/content');
-          } else {
-            this.router.navigateByUrl('/aprobation');
-          }
-        }).finally(() => {
-          this.biometric.registerBiometric(this.loginForm.value as User)
-        })
-        .catch((err) => {
-          this.viewSrvc.toastPresent('Verifique usuario o contraseña', 'danger');
-        });
+  async authenUser() {
+    const loginData = localStorage.getItem('xionico_user_temp');
+    if (!loginData) return;
+
+    const valid = await this.biometric.verify();
+
+    if (valid) {
+      const user = JSON.parse(loginData);
+      await this.servers.singIn(user);
     }
   }
 
   register() {
     this.router.navigateByUrl('/register');
   }
-
 
   ionViewWillLeave() {
     const activeEl = document.activeElement as HTMLElement;

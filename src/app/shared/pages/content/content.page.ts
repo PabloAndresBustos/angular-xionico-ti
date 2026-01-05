@@ -54,7 +54,7 @@ export class ContentPage implements OnInit {
       if (dists.length > 0 && (!currentDist || !dists.includes(currentDist))) {
         untracked(() => this.selectedDistributor.set(dists[0]));
       }
-    }); // <-- Ya no hace falta el objeto de configuración aquí
+    });
 
     effect(() => {
       const list = this.serversInSelectedDist();

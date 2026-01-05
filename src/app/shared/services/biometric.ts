@@ -1,64 +1,69 @@
 import { inject, Injectable } from '@angular/core';
-import { NativeBiometric } from 'capacitor-native-biometric';
-import { ViewServices } from './view-services';
-import { Servers } from './servers';
-import { Router } from '@angular/router';
-import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Biometric {
-  private viewSrvc = inject(ViewServices);
-  private server = inject(Servers);
-  private router = inject(Router);
+  private readonly CRED_ID_KEY = 'xionico_auth_cred_id';
 
-  async registerBiometric(user: User){
-    try {
-      const verify = await NativeBiometric.isAvailable();
-      if(!verify.isAvailable) return;
-
-      await NativeBiometric.setCredentials({
-        username: user.email,
-        password: user.password,
-        server: "xionico-backoffice-ti"
-      });
-
-      this.viewSrvc.toastPresent('Registro biometrico existoso', 'success');
-
-    } catch (error) {
-      console.log(error)
-      this.viewSrvc.toastPresent('Error inesperado en el registro', 'warning')
-    }
-
+  async isAvailalbe(): Promise<boolean> {
+    return !!(
+      window.PublicKeyCredential &&
+      (await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())
+    );
   }
 
-  async authenUser() {
+  async registerBio(email: string): Promise<boolean> {
     try {
-      const result = await NativeBiometric.isAvailable();
+      const challenge = crypto.getRandomValues(new Uint8Array(32));
+      const userId = crypto.getRandomValues(new Uint8Array(16));
 
-      if (!result.isAvailable) {
-        this.viewSrvc.toastPresent(
-          'Este equipo no cuenta con doble seguridad, no es posible usar esa pagina',
-          'danger'
-        );
-        this.server.signOut();
-        return;
-      }
+      const credentials = (await navigator.credentials.create({
+        publicKey: {
+          challenge,
+          rp: { name: 'Xionico BackOffice Ti' },
+          user: {
+            id: userId,
+            name: email,
+            displayName: email,
+          },
+          pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
+          authenticatorSelection: { userVerification: 'required' },
+          timeout: 60000,
+        },
+      })) as PublicKeyCredential;
 
-      await NativeBiometric.verifyIdentity({
-        reason: 'Acceso seguro al BackOffice Ti Xioncio',
-        title: 'Identidad Requerida',
-        subtitle: 'Usar biometria o tu PIN de sistema',
-        description: 'Verifica tu identidad para continar',
-        maxAttempts: 3,
+      localStorage.setItem(
+        this.CRED_ID_KEY,
+        btoa(String.fromCharCode(...new Uint8Array(credentials.rawId)))
+      );
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async verify(): Promise<boolean> {
+    const saveId = localStorage.getItem(this.CRED_ID_KEY);
+    if (!saveId) return false;
+
+    try {
+      const challenge = crypto.getRandomValues(new Uint8Array(32))
+      await navigator.credentials.get({
+        publicKey: {
+          challenge,
+          allowCredentials: [{
+            id: Uint8Array.from(atob(saveId), c => c.charCodeAt(0)),
+            type: 'public-key'
+          }],
+          userVerification: 'required',
+          timeout: 60000,
+        },
       });
-
-      this.router.navigateByUrl('/content');
-    } catch (error: any) {
-      const msg = error.message || 'Autenticacion cancelada'
-      this.viewSrvc.toastPresent(msg, 'danger')
-      this.router.navigateByUrl('/login');
+      return true;
+    } catch (error) {
+      console.error('webAuthn error', error);
+      return false;
     }
   }
 }

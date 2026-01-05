@@ -31,7 +31,6 @@
     "@emailjs/browser": "^4.4.1",
     "@ionic/angular": "^8.0.0",
     "@tailwindcss/postcss": "^4.1.17",
-    "capacitor-native-biometric": "^4.2.2",
     "firebase": "^12.6.0",
     "ionicons": "^7.0.0",
     "postcss": "^8.5.6",
