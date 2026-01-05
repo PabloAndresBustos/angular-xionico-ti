@@ -15,12 +15,14 @@
       <form [formGroup]="loginForm" (ngSubmit)="submit()" class="space-y-4">
 
         <div class="space-y-1">
-          <app-custom-input [isPassword]="false" [inputLabel]="'E-mail'" [inputType]="'email'" [iconName]="'mail-outline'"
-            [formControlValue]="loginForm.controls.email" />
+          <app-custom-input [isPassword]="false" [inputLabel]="'E-mail'" [inputType]="'email'"
+            [iconName]="'mail-outline'" [formControlValue]="loginForm.controls.email" />
 
           @if(loginForm.controls.email.errors && loginForm.controls.email.touched){
-            <app-validator-form [message]="'Correo requerido'" [showMessage]="loginForm.controls.email.errors['required']" [slot]="'start'" />
-            <app-validator-form [message]="'Formato de correo no válido'" [showMessage]="loginForm.controls.email.errors['email']" [slot]="'start'" />
+          <app-validator-form [message]="'Correo requerido'" [showMessage]="loginForm.controls.email.errors['required']"
+            [slot]="'start'" />
+          <app-validator-form [message]="'Formato de correo no válido'"
+            [showMessage]="loginForm.controls.email.errors['email']" [slot]="'start'" />
           }
         </div>
 
@@ -29,7 +31,8 @@
             [iconName]="'lock-closed-outline'" [formControlValue]="loginForm.controls.password" />
 
           @if (loginForm.controls.password.errors && loginForm.controls.password.touched) {
-            <app-validator-form [message]="'Contraseña requerida'" [showMessage]="loginForm.controls.password.errors['required']" [slot]="'start'" />
+          <app-validator-form [message]="'Contraseña requerida'"
+            [showMessage]="loginForm.controls.password.errors['required']" [slot]="'start'" />
           }
         </div>
 
@@ -40,7 +43,8 @@
         </div>
 
         <div class="pt-4 flex flex-col gap-3">
-          <ion-button type="submit" expand="block" color="xionico" mode="md" [disabled]="loginForm.invalid" class="h-12 font-bold shadow-md">
+          <ion-button type="submit" expand="block" color="xionico" mode="md" [disabled]="loginForm.invalid"
+            class="h-12 font-bold shadow-md">
             <ion-icon slot="start" name="log-in-outline" class="mr-2"></ion-icon>
             Ingresar
           </ion-button>
@@ -51,7 +55,8 @@
             <div class="flex-grow h-px bg-gray-100"></div>
           </div>
 
-          <ion-button expand="block" fill="outline" color="primary" mode="md" (click)="register()" class="h-12 font-semibold">
+          <ion-button expand="block" fill="outline" color="primary" mode="md" (click)="register()"
+            class="h-12 font-semibold">
             <ion-icon slot="start" name="person-add-outline" class="mr-2"></ion-icon>
             Solicitar cuenta
           </ion-button>
@@ -60,14 +65,13 @@
       </form>
     </div>
 
-    @if(fingerPrint()){
-      <div class="mt-12 flex flex-col items-center animate-bounce">
-        <ion-button fill="clear">
-          <ion-icon name="finger-print-outline" class="text-6xl" color="xionico"></ion-icon>
-        </ion-button>
-        <p class="text-xs text-gray-400 font-medium mt-2">Ingreso biométrico</p>
-      </div>
-    }
+    <div class="mt-12 flex flex-col items-center animate-bounce">
+      <ion-button fill="clear" (click)="authenUser()">
+        <ion-icon name="finger-print-outline" class="text-6xl" color="xionico"></ion-icon>
+      </ion-button>
+      <p class="text-xs text-gray-400 font-medium mt-2">Ingreso biométrico</p>
+    </div>
+
 
   </div>
 </ion-content>

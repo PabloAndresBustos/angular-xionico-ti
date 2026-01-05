@@ -13,7 +13,7 @@ import { Servers } from '../../services/servers';
 import { User } from '../../models/user.model';
 import { ComponentsModule } from '../../modules/components/components-module';
 import { IonicElementsModule } from '../../modules/ionic-elements/ionic-elements-module';
-import { NativeBiometric } from 'capacitor-native-biometric';
+import { Biometric } from '../../services/biometric';
 import { addIcons } from 'ionicons';
 import {
   key,
@@ -24,6 +24,7 @@ import {
   alertCircleOutline,
   mailOutline,
 } from 'ionicons/icons';
+
 
 @Component({
   selector: 'app-login',
@@ -42,6 +43,7 @@ export class LoginPage implements OnInit {
   private router = inject(Router);
   private viewSrvc = inject(ViewServices);
   private servers = inject(Servers);
+  private biometric = inject(Biometric);
 
   constructor() {
     addIcons({
@@ -60,8 +62,8 @@ export class LoginPage implements OnInit {
     password: new FormControl('', [Validators.required]),
   });
 
-  fingerPrint() {
-    return this.viewSrvc.fingerPrint;
+  authenUser() {
+    return this.biometric.authenUser();
   }
 
   submit() {
@@ -71,12 +73,13 @@ export class LoginPage implements OnInit {
         .then((res) => {
           const userData = res.user;
           if (userData.approved) {
-            console.log(userData);
             this.viewSrvc.toastPresent(`Bienvenido ${userData.name.toUpperCase()}`, 'success');
             this.router.navigateByUrl('/content');
           } else {
             this.router.navigateByUrl('/aprobation');
           }
+        }).finally(() => {
+          this.biometric.registerBiometric(this.loginForm.value as User)
         })
         .catch((err) => {
           this.viewSrvc.toastPresent('Verifique usuario o contraseña', 'danger');
@@ -88,31 +91,6 @@ export class LoginPage implements OnInit {
     this.router.navigateByUrl('/register');
   }
 
-
-
-  /*   async authWithFingerprint() {
-  try {
-    const result = await NativeBiometric.isAvailable();
-
-    if(!result.isAvailable) return;
-
-    const verified = await NativeBiometric.verifyIdentity({
-      reason: "Para ingresar a tu cuenta de monitoreo",
-      title: "Ingreso Biométrico",
-      subtitle: "Usa tu huella o rostro",
-      description: "Confirma tu identidad para continuar"
-    });
-
-    if(verified) {
-      // 1. Aquí debes llamar a tu función de login
-      // 2. Lo ideal es haber guardado las credenciales en el SecureStorage la primera vez
-      console.log('Identidad verificada con éxito');
-      this.submit(); // Llama a tu función de ingreso normal
-    }
-  } catch (error) {
-    console.error("Error en biometría", error);
-  }
-} */
 
   ionViewWillLeave() {
     const activeEl = document.activeElement as HTMLElement;
