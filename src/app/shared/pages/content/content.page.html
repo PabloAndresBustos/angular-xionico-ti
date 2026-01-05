@@ -15,7 +15,7 @@
   </div>
   }
 
-  <div class="p-4 lg:p-6">
+  <div class="p-4 px-0 lg:p-6">
     @if (activeServer(); as data) {
     <section class="bg-gradient-to-r from-(--ion-xionico-color) to-blue-700 rounded-t-3xl p-6 shadow-lg text-white">
       <div class="flex items-center justify-between mb-6">
@@ -53,20 +53,20 @@
       </div>
     </section>
 
-    <div class="bg-white rounded-b-3xl p-6 shadow-xl border-x border-b border-gray-100">
+    <div class="bg-white rounded-b-3xl p-6 shadow-xl border-x border-b border-gray-100 px-0">
       <ion-grid class="ion-no-padding">
         <ion-row class="gap-6">
           <ion-col size="12" size-lg="7">
             <app-cards [title]="'Servicios'" [type]="'services'" [serverData]="data"
               [colNames]="['Favorito', 'Nombre', 'Estado', 'Acción']" [DISTRIBUIDORA_ID]="data.nombreDistribuidora"
-              [SERVER_ID]="data.nombreServidor" />
+              [SERVER_ID]="data.nombreServidor"/>
           </ion-col>
 
           <ion-col size="12" size-lg="">
             <div class="flex flex-col gap-6">
               <app-cards [title]="'Hardware'" [type]="'hardware'" [hardware]="data.hardware" />
               <app-cards [title]="'Salud Almacenamiento'" [type]="'disk'" [disks]="data.disk_status" />
-              <app-cards [title]="'Backups'" [type]="'backups'" [backups]="data.backups.lastBackups" />
+              <app-cards [title]="'Backups'" [type]="'backups'" [backups]="data.backups" />
             </div>
           </ion-col>
         </ion-row>

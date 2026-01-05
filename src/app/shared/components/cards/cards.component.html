@@ -4,17 +4,15 @@
       <span class="text-lg font-bold">{{title()}}</span>
 
       @if(type() === 'services') {
-      <div class="w-[55%] mr-2">
-        <ion-segment [value]="selectedTab()" (ionChange)="selectedTab.set($any($event).detail.value)" mode="ios"
-          class="bg-white/20 rounded-lg">
-          <ion-segment-button value="Recomendados">
-            <ion-label class="text-xs text-white">Críticos ({{totalRecomendados()}})</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="General">
-            <ion-label class="text-xs text-white">Generales ({{totalGeneral()}})</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-      </div>
+      <ion-segment [value]="selectedTab()" (ionChange)="selectedTab.set($any($event).detail.value)" mode="ios"
+        class="pill-segment">
+        <ion-segment-button value="Recomendados">
+          <ion-label class="text-xs">Críticos ({{totalRecomendados()}})</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="General">
+          <ion-label class="text-xs">Generales ({{totalGeneral()}})</ion-label>
+        </ion-segment-button>
+      </ion-segment>
       }
     </ion-card-title>
   </ion-card-header>
@@ -28,143 +26,154 @@
     </div>
     }
 
-    <div [class.scroll-container]="type() === 'services'" class="custom-scroll">
+    <div [class.scroll-container]="type() === 'services'" class="custom-scroll w-[100%]">
       <ion-grid class="p-0">
         @if(type() === 'services') {
-          @for (service of displayServices(); track service.id) {
-          <ion-item lines="full" class="hover:bg-gray-50">
-            <div class="flex flex-col w-full py-3">
+        @for (service of displayServices(); track service.id) {
+        <ion-item lines="full" class="hover:bg-gray-50">
+          <div class="flex flex-col w-full py-3">
 
-              <div class="flex items-start gap-2 mb-2">
-                <ion-button fill="clear" (click)="toggleFav(service)" class="m-0 h-6 w-6">
-                  <ion-icon slot="icon-only"
-                            [name]="service.isRecommended ? 'star' : 'star-outline'"
-                            [color]="service.isRecommended ? 'warning' : 'medium'"
-                            class="text-xl">
-                  </ion-icon>
+            <div class="flex items-start gap-2 mb-2">
+              <ion-button fill="clear" (click)="toggleFav(service)" class="m-0 h-6 w-6">
+                <ion-icon slot="icon-only" [name]="service.isRecommended ? 'star' : 'star-outline'"
+                  [color]="service.isRecommended ? 'warning' : 'medium'" class="text-xl">
+                </ion-icon>
+              </ion-button>
+
+              <ion-label class="font-bold text-sm text-wrap leading-tight pt-1">
+                {{service.name}}
+              </ion-label>
+            </div>
+
+            <div class="flex justify-between items-center bg-gray-50 rounded-lg px-2 py-1 ml-8">
+              <div class="flex items-center gap-2">
+                <ion-icon [color]="statusIconColor(service.status)" [name]="statusIcon(service.status)" size="large">
+                </ion-icon>
+                <span class="text-[10px] font-extrabold uppercase tracking-tighter"
+                  [style.color]="'var(--ion-color-' + statusIconColor(service.status) + ')'">
+                  {{serviceStatus(service.status)}}
+                </span>
+              </div>
+
+              <ion-buttons class="gap-2">
+                <ion-button fill="solid" color="xionico" size="small" expand="block" shape="round"
+                  (click)="toggleService(service)" [disabled]="service.status === 'RUNNING'"
+                  class="h-9 w-12 rounded-md m-0">
+                  <ion-icon slot="icon-only" name="play"></ion-icon>
                 </ion-button>
 
-                <ion-label class="font-bold text-sm text-wrap leading-tight pt-1">
-                  {{service.name}}
-                </ion-label>
-              </div>
-
-              <div class="flex justify-between items-center bg-gray-50 rounded-lg px-2 py-1 ml-8">
-                <div class="flex items-center gap-2">
-                  <ion-icon [color]="statusIconColor(service.status)"
-                            [name]="statusIcon(service.status)"
-                            size="small">
-                  </ion-icon>
-                  <span class="text-[10px] font-extrabold uppercase tracking-tighter"
-                        [style.color]="'var(--ion-color-' + statusIconColor(service.status) + ')'">
-                    {{service.status}}
-                  </span>
-                </div>
-
-                <ion-buttons class="gap-2">
-                  <ion-button fill="solid" color="xionico" size="small"
-                              (click)="toggleService(service)"
-                              [disabled]="service.status === 'RUNNING'"
-                              class="h-9 w-12 rounded-md m-0">
-                    <ion-icon slot="icon-only" name="play"></ion-icon>
-                  </ion-button>
-
-                  <ion-button fill="outline" color="danger" size="small"
-                              (click)="toggleService(service)"
-                              [disabled]="service.status !== 'RUNNING'"
-                              class="h-9 w-12 rounded-md m-0">
-                    <ion-icon slot="icon-only" name="stop"></ion-icon>
-                  </ion-button>
-                </ion-buttons>
-              </div>
+                <ion-button fill="outline" color="danger" size="small" expand="block" shape="round"
+                  (click)="toggleService(service)" [disabled]="service.status !== 'RUNNING'"
+                  class="h-9 w-12 rounded-md m-0">
+                  <ion-icon slot="icon-only" name="stop"></ion-icon>
+                </ion-button>
+              </ion-buttons>
             </div>
-          </ion-item>
-          } @empty {
-          <div class="text-center p-8 text-gray-400">
-            <ion-icon name="search-outline" size="large"></ion-icon>
-            <p>No se encontraron servicios</p>
           </div>
-          }
+        </ion-item>
+        } @empty {
+        <div class="text-center p-8 text-gray-400">
+          <ion-icon name="search-outline" size="large"></ion-icon>
+          <p>No se encontraron servicios</p>
+        </div>
+        }
         }
 
         @else if(type() === 'disk') {
-          @for (disk of disks(); track $index) {
-          <ion-item lines="full">
-            <div class="flex justify-between w-full items-center py-2">
-              @if(!disk.connected) {
-              <ion-label color="danger" class="font-bold">{{disk.path}} - Desconectado</ion-label>
-              <ion-icon color="danger" name="remove-circle" size="large"></ion-icon>
-              } @else {
-              <div class="w-full">
-                <div class="flex justify-between mb-1">
-                  <ion-label class="font-bold">{{disk.path}}</ion-label>
-                  <ion-label color="medium">Libre: {{disk.freeGB}} GB</ion-label>
-                </div>
-                <div class="flex items-center gap-3">
-                  <ion-progress-bar [value]="disk.usageRatio" [color]="disk.usageRatio > 0.9 ? 'danger' : 'primary'"
-                    class="h-3 rounded-full">
-                  </ion-progress-bar>
-                  <span class="text-xs font-bold">{{disk.usagePercentage}}%</span>
-                </div>
+        @for (disk of disks(); track $index) {
+        <ion-item lines="full">
+          <div class="flex justify-between w-full items-center py-2">
+            @if(!disk.connected) {
+            <ion-label color="danger" class="font-bold">{{disk.path}} - Desconectado</ion-label>
+            <ion-icon color="danger" name="remove-circle" size="large"></ion-icon>
+            } @else {
+            <div class="w-full">
+              <div class="flex justify-between mb-1">
+                <ion-label class="font-bold">{{disk.path}}</ion-label>
+                <ion-label color="medium">Libre: {{disk.freeGB}} GB</ion-label>
               </div>
-              }
+              <div class="flex items-center gap-3">
+                <ion-progress-bar [value]="disk.usageRatio" [color]="disk.usageRatio > 0.9 ? 'danger' : 'primary'"
+                  class="h-3 rounded-full">
+                </ion-progress-bar>
+                <span class="text-xs font-bold">{{disk.usagePercentage}}%</span>
+              </div>
             </div>
-          </ion-item>
-          }
+            }
+          </div>
+        </ion-item>
+        }
         }
 
         @else if(type() === 'backups') {
-          @for (backup of backups(); track $index) {
-          <ion-item lines="full">
-            <div class="flex justify-between w-full items-center py-1">
-              <div class="flex flex-col">
-                <ion-label class="font-bold">{{backup.dateParsed}}</ion-label>
-                <ion-note class="text-xs">{{backup.filename}}</ion-note>
-              </div>
-              <ion-icon [color]="backupColor(backup.status)" [name]="backupIcon(backup.status)" size="large">
-              </ion-icon>
+        @if (backups()?.error) {
+        <div class="flex flex-col items-center justify-center p-8 text-center">
+          <ion-icon name="warning-outline" color="danger" class="text-5xl mb-2"></ion-icon>
+          <ion-label class="text-danger font-bold text-sm">
+            {{ backups()?.error }}
+          </ion-label>
+          <ion-note class="text-xs mt-1">Verifique el disco, osi se administran los backups.</ion-note>
+        </div>
+        }
+
+        @else {
+        @for (backup of backups()?.lastBackups; track $index) {
+        <ion-item lines="full">
+          <div class="flex justify-between w-full items-center py-1">
+            <div class="flex flex-col">
+              <ion-label class="font-bold">{{ backup.dateParsed }}</ion-label>
+              <ion-note class="text-xs">{{ backup.filename }}</ion-note>
             </div>
-          </ion-item>
-          }
+            <ion-icon [color]="backupColor(backup.status)" [name]="backupIcon(backup.status)" size="large">
+            </ion-icon>
+          </div>
+        </ion-item>
+        } @empty {
+        <div class="text-center p-8 text-gray-400">
+          <ion-icon name="cloud-offline-outline" size="large"></ion-icon>
+          <p>No hay archivos de backup disponibles</p>
+        </div>
+        }
+        }
         }
 
         @else if(type() === 'hardware' && hardware()){
-          <ion-item lines="full">
-            <div class="w-full py-2">
-              <div class="flex justify-between mb-1">
-                <ion-label class="font-bold flex items-center gap-2">
-                  <ion-icon name="speedometer-outline" color="primary"></ion-icon>
-                  Procesador (CPU)
-                </ion-label>
-              </div>
-              <div class="flex items-center gap-3">
-                <ion-progress-bar [value]="hardware()?.cpu?.usageRatio || 0"
-                  [color]="(hardware()?.cpu?.usagePercentage || 0) > 80 ? 'danger' : 'primary'" class="h-3 rounded-full">
-                </ion-progress-bar>
-                <span class="text-xs font-bold w-10 text-end">{{hardware()?.cpu?.usagePercentage}}%</span>
-              </div>
+        <ion-item lines="full">
+          <div class="w-full py-2">
+            <div class="flex justify-between mb-1">
+              <ion-label class="font-bold flex items-center gap-2">
+                <ion-icon name="speedometer-outline" color="primary"></ion-icon>
+                Procesador (CPU)
+              </ion-label>
             </div>
-          </ion-item>
-          <ion-item lines="full">
-            <div class="w-full py-2">
-              <div class="flex justify-between mb-1">
-                <ion-label class="font-bold flex items-center gap-2">
-                  <ion-icon name="hardware-chip-outline" color="secondary"></ion-icon>
-                  Memoria RAM
-                </ion-label>
-                <ion-label color="medium" class="text-xs">
-                  {{hardware()?.ram?.usedGB}} / {{hardware()?.ram?.totalGB}} GB
-                </ion-label>
-              </div>
-              <div class="flex items-center gap-3">
-                <ion-progress-bar [value]="hardware()?.ram?.usageRatio || 0"
-                  [color]="(+(hardware()?.ram?.usagePercentage || 0)) > 90 ? 'danger' : 'secondary'"
-                  class="h-3 rounded-full">
-                </ion-progress-bar>
-                <span class="text-xs font-bold w-10 text-end">{{hardware()?.ram?.usagePercentage}}%</span>
-              </div>
+            <div class="flex items-center gap-3">
+              <ion-progress-bar [value]="hardware()?.cpu?.usageRatio || 0"
+                [color]="(hardware()?.cpu?.usagePercentage || 0) > 80 ? 'danger' : 'primary'" class="h-3 rounded-full">
+              </ion-progress-bar>
+              <span class="text-xs font-bold w-10 text-end">{{hardware()?.cpu?.usagePercentage}}%</span>
             </div>
-          </ion-item>
+          </div>
+        </ion-item>
+        <ion-item lines="full">
+          <div class="w-full py-2">
+            <div class="flex justify-between mb-1">
+              <ion-label class="font-bold flex items-center gap-2">
+                <ion-icon name="hardware-chip-outline" color="secondary"></ion-icon>
+                Memoria RAM
+              </ion-label>
+              <ion-label color="medium" class="text-xs">
+                {{hardware()?.ram?.usedGB}} / {{hardware()?.ram?.totalGB}} GB
+              </ion-label>
+            </div>
+            <div class="flex items-center gap-3">
+              <ion-progress-bar [value]="hardware()?.ram?.usageRatio || 0"
+                [color]="(+(hardware()?.ram?.usagePercentage || 0)) > 90 ? 'danger' : 'secondary'"
+                class="h-3 rounded-full">
+              </ion-progress-bar>
+              <span class="text-xs font-bold w-10 text-end">{{hardware()?.ram?.usagePercentage}}%</span>
+            </div>
+          </div>
+        </ion-item>
         }
       </ion-grid>
     </div>

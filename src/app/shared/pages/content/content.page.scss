@@ -30,6 +30,7 @@
     --color-checked: #3880ff;
     --indicator-color: #ffffff;
     --indicator-height: 100%;
+    --border-radius: 15px;
     margin: 0 2px;
     min-width: 90px;
     max-width: 150px;
@@ -51,17 +52,18 @@
 .distributor-pill-segment {
   width: auto !important;
   max-width: fit-content;
-  background: #f4f5f8; // Fondo gris claro para las pildoras
+  background: #f4f5f8;
   border-radius: 50px;
   padding: 2px;
   border: none;
 
   ion-segment-button {
     --indicator-box-shadow: none;
-    --indicator-color: #ffffff; // Fondo de la pildora seleccionada
+    --indicator-color: #ffffff;
     --indicator-height: 100%;
     --color: #666;
-    --color-checked: var(--ion-color-primary); // O el color de tu marca
+    --color-checked: var(--ion-color-primary);
+    --border-radius: 15px;
     min-width: 110px;
     height: 32px;
     margin: 0 2px;

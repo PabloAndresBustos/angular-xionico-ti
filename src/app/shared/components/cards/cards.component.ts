@@ -2,7 +2,7 @@ import { Component, computed, inject, Input, input, OnInit, signal } from '@angu
 import { IonicElementsModule } from '../../modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from '../../modules/components/components-module';
 import { Servers } from '../../services/servers';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc,  } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
 import {
   thumbsUp,
@@ -16,13 +16,21 @@ import {
   star,
   starOutline,
   speedometerOutline,
-  hardwareChipOutline
+  hardwareChipOutline,
+  warningOutline,
+  cloudOfflineOutline
 } from 'ionicons/icons';
 
 
 interface HardwareInfo {
   cpu: { usagePercentage: number; usageRatio: number };
   ram: { totalGB: string; usedGB: string; usagePercentage: string; usageRatio: number };
+}
+
+interface BackupResponse {
+  lastBackups: any[];
+  backupFoundToday: boolean;
+  error?: string;
 }
 
 @Component({
@@ -38,7 +46,7 @@ export class CardsComponent implements OnInit {
   type = input.required<string>();
   services = input<any[]>();
   disks = input<any[]>();
-  backups = input<any[]>();
+  backups = input<BackupResponse | null>();
   hardware = input<HardwareInfo | null>(null);
   serverData = input<any>();
   selectedTab = signal<string>('Recomendados');
@@ -62,7 +70,9 @@ export class CardsComponent implements OnInit {
       star,
       starOutline,
       speedometerOutline,
-      hardwareChipOutline
+      hardwareChipOutline,
+      warningOutline,
+      cloudOfflineOutline
     });
   }
 
@@ -120,6 +130,14 @@ export class CardsComponent implements OnInit {
     )
   }
 
+  serviceStatus(service: any){
+    if (service === 'RUNNING') {
+      return 'EN EJECUCION'
+    }else{
+      return 'DETENIDO'
+    }
+  }
+
   displayServices = computed(() => {
     const data = this.serverData();
     const tab = this.selectedTab();
@@ -140,6 +158,7 @@ export class CardsComponent implements OnInit {
 
   totalRecomendados = computed(() => this.serverData()?.serviciosRecomendados?.length || 0);
   totalGeneral = computed(() => this.serverData()?.serviciosGeneral?.length || 0);
+
 
   ngOnInit() {}
 }

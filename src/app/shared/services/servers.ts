@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, OnDestroy } from '@angular/core';
+import { Injectable, signal, computed, OnDestroy, inject } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import { environment } from '../../../environments/environment';
 import { User } from '../models/user.model';
@@ -28,6 +28,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -37,6 +38,7 @@ export class Servers implements OnDestroy {
   public db = getFirestore(this.app);
   private auth = getAuth(this.app);
   private unsubscribeList: Unsubscribe | null = null;
+  private router = inject(Router);
 
   allServersData = signal<any[]>([]);
   authService = signal<User | null>(null);
@@ -55,7 +57,6 @@ export class Servers implements OnDestroy {
         const profile = userSnap.data() as User;
         this.authService.set(profile);
 
-        // CAMBIO AQUÍ: Si es Admin/Soporte, necesitamos una escucha diferente
         if (profile.role === 0 || profile.role === 1) {
           this.listenToAllServersAdmin();
         } else {
@@ -72,8 +73,6 @@ export class Servers implements OnDestroy {
 private listenToAllServersAdmin() {
   if (this.unsubscribeList) this.unsubscribeList();
 
-  // Cambiamos el require por una referencia directa si es posible,
-  // o tipamos manualmente los argumentos del snapshot
   const q = query(collectionGroup(this.db, 'servidores'));
 
   this.unsubscribeList = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
@@ -105,7 +104,6 @@ private listenToAllServersAdmin() {
   processedServers = computed(() => {
     const allData = this.allServersData();
     const user = this.authService();
-    const ROLES = environment.userProfile;
 
     if (!user || !user.approved) return [];
 
@@ -175,7 +173,9 @@ private listenToAllServersAdmin() {
   }
 
   async signOut() {
-    return getAuth().signOut();
+    return getAuth().signOut().then(() => {
+      this.router.navigateByUrl('/login');
+    })
   }
 
   async register(user: User) {

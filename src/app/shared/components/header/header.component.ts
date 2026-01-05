@@ -1,8 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { IonHeader } from "@ionic/angular/standalone";
 import { IonicElementsModule } from '../../modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from '../../modules/components/components-module';
 import { ViewServices } from '../../services/view-services';
+import { addIcons } from 'ionicons';
+import { logOutOutline } from 'ionicons/icons';
+import { Servers } from '../../services/servers';
 
 @Component({
   selector: 'app-header',
@@ -14,11 +16,20 @@ import { ViewServices } from '../../services/view-services';
 export class HeaderComponent  implements OnInit {
 
   private viewSrv = inject(ViewServices);
+  private serversSrvc = inject(Servers);
 
-  constructor() { }
+  constructor() {
+    addIcons({
+      logOutOutline
+    })
+  }
 
   platform(){
     return this.viewSrv.isMobile;
+  }
+
+  signOut(){
+    this.serversSrvc.signOut();
   }
 
   ngOnInit() {}
