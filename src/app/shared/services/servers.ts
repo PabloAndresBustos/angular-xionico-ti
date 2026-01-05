@@ -28,6 +28,7 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { Router } from '@angular/router';
+import { ViewServices } from './view-services';
 
 @Injectable({
   providedIn: 'root',
@@ -38,6 +39,8 @@ export class Servers implements OnDestroy {
   private auth = getAuth(this.app);
   private unsubscribeList: Unsubscribe | null = null;
   private router = inject(Router);
+  private viewSrv = inject(ViewServices);
+
 
   allServersData = signal<any[]>([]);
   authService = signal<User | null>(null);
@@ -174,14 +177,22 @@ private listenToAllServersAdmin() {
     const userDoc = await getDoc(doc(getFirestore(), 'users', userId));
 
     if(userDoc.exists()){
-      return {user: userDoc.data() as User}
+      const userData = {user: userDoc.data() as User}
+      if(userData.user.approved){
+        this.viewSrv.toastPresent(`Bienvenido ${userData.user.name.toUpperCase()}`, 'success');
+        this.viewSrv.isLogin.set(true);
+        this.router.navigateByUrl('/content');
+      }else{
+        this.router.navigateByUrl('/aprobation');
+      }
     } else {
-      throw new Error('El usuario no existe o se encuentra pendiente de aprovacion')
+      this.viewSrv.toastPresent('Verifique usuario o contraseña', 'danger');
     }
   }
 
   async signOut() {
     return getAuth().signOut().then(() => {
+      this.viewSrv.isLogin.set(false)
       this.router.navigateByUrl('/login');
     })
   }

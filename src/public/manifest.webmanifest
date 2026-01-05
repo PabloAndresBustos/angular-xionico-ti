@@ -1,6 +1,6 @@
 {
-  "name": "Xionico BO TI",
-  "short_name": "BO TI",
+  "name": "Xionico BackOffice TI",
+  "short_name": "Xionico BOTi",
   "display": "standalone",
   "backgrond_color": "#ffffff",
   "theme_color":"#3880ff",

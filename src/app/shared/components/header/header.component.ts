@@ -32,6 +32,10 @@ export class HeaderComponent  implements OnInit {
     this.serversSrvc.signOut();
   }
 
+  isLogin(){
+    return this.viewSrv.isLogin();
+  }
+
   ngOnInit() {}
 
 }
