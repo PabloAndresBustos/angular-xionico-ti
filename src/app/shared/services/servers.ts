@@ -3,6 +3,9 @@ import { initializeApp } from 'firebase/app';
 import { environment } from '../../../environments/environment';
 import { User } from '../models/user.model';
 import emailjs from '@emailjs/browser';
+import { Router } from '@angular/router';
+import { ViewServices } from './view-services';
+import { Biometric } from './biometric';
 import {
   getFirestore,
   collection,
@@ -27,8 +30,6 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { Router } from '@angular/router';
-import { ViewServices } from './view-services';
 
 @Injectable({
   providedIn: 'root',
@@ -40,7 +41,7 @@ export class Servers implements OnDestroy {
   private unsubscribeList: Unsubscribe | null = null;
   private router = inject(Router);
   private viewSrv = inject(ViewServices);
-
+  private biometric = inject(Biometric);
 
   allServersData = signal<any[]>([]);
   authService = signal<User | null>(null);
@@ -50,41 +51,47 @@ export class Servers implements OnDestroy {
   }
 
   private listenToAuthChanges() {
-  onAuthStateChanged(this.auth, async (dbUser) => {
-    if (dbUser) {
-      const userData = doc(this.db, `users/${dbUser.uid}`);
-      const userSnap = await getDoc(userData);
+    onAuthStateChanged(this.auth, async (dbUser) => {
+      if (dbUser) {
+        const userData = doc(this.db, `users/${dbUser.uid}`);
+        const userSnap = await getDoc(userData);
 
-      if (userSnap.exists()) {
-        const profile = userSnap.data() as User;
-        this.authService.set(profile);
+        if (userSnap.exists()) {
+          const profile = userSnap.data() as User;
+          this.authService.set(profile);
 
-        if (profile.role === 0 || profile.role === 1) {
-          this.listenToAllServersAdmin();
-        } else {
-          const distId = profile.distribuidoraAsignada || profile.distribuidoraObjetivo;
-          this.listenToServersRealTime(distId);
+          if (profile.role === 0 || profile.role === 1) {
+            this.listenToAllServersAdmin();
+          } else {
+            const distId =
+              profile.distribuidoraAsignada || profile.distribuidoraObjetivo;
+            this.listenToServersRealTime(distId);
+          }
         }
+      } else {
+        this.authService.set(null);
       }
-    } else {
-      this.authService.set(null);
-    }
-  });
-}
+    });
+  }
 
-private listenToAllServersAdmin() {
-  if (this.unsubscribeList) this.unsubscribeList();
+  private listenToAllServersAdmin() {
+    if (this.unsubscribeList) this.unsubscribeList();
 
-  const q = query(collectionGroup(this.db, 'servidores'));
+    const q = query(collectionGroup(this.db, 'servidores'));
 
-  this.unsubscribeList = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
-    const data = snapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    this.allServersData.set(data);
-  });
-}
+    this.unsubscribeList = onSnapshot(
+      q,
+      (snapshot: QuerySnapshot<DocumentData>) => {
+        const data = snapshot.docs.map(
+          (doc: QueryDocumentSnapshot<DocumentData>) => ({
+            id: doc.id,
+            ...doc.data(),
+          })
+        );
+        this.allServersData.set(data);
+      }
+    );
+  }
 
   private listenToServersRealTime(distribuidoraId: string) {
     if (this.unsubscribeList) this.unsubscribeList();
@@ -110,7 +117,6 @@ private listenToAllServersAdmin() {
     if (!user || !user.approved) return [];
 
     const filteredData = allData.filter((server) => {
-
       if (user.role === 0 || user.role === 1) {
         return true;
       }
@@ -171,18 +177,29 @@ private listenToAllServersAdmin() {
   }
 
   async singIn(user: User) {
-    const credential = await signInWithEmailAndPassword(getAuth(), user.email, user.password);
+    const credential = await signInWithEmailAndPassword(
+      getAuth(),
+      user.email,
+      user.password
+    );
     const userId = credential.user.uid;
 
     const userDoc = await getDoc(doc(getFirestore(), 'users', userId));
 
-    if(userDoc.exists()){
-      const userData = {user: userDoc.data() as User}
-      if(userData.user.approved){
-        this.viewSrv.toastPresent(`Bienvenido ${userData.user.name.toUpperCase()}`, 'success');
-        this.viewSrv.isLogin.set(true);
-        this.router.navigateByUrl('/content');
-      }else{
+    if (userDoc.exists()) {
+      const userData = { user: userDoc.data() as User };
+      if (userData.user.approved) {
+        const availableBio = await this.biometric.isAvailalbe();
+        const bioIsRegister = localStorage.getItem('xionico_auth_cred_id');
+
+        if (availableBio && !bioIsRegister) {
+          await this.biometric.registerBio(userData.user.email);
+          localStorage.setItem(
+            'xionico_user_temp',
+            JSON.stringify(userData.user)
+          );
+        }
+      } else {
         this.router.navigateByUrl('/aprobation');
       }
     } else {
@@ -191,10 +208,12 @@ private listenToAllServersAdmin() {
   }
 
   async signOut() {
-    return getAuth().signOut().then(() => {
-      this.viewSrv.isLogin.set(false)
-      this.router.navigateByUrl('/login');
-    })
+    return getAuth()
+      .signOut()
+      .then(() => {
+        this.viewSrv.isLogin.set(false);
+        this.router.navigateByUrl('/login');
+      });
   }
 
   async register(user: User) {

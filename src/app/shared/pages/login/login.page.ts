@@ -40,7 +40,7 @@ import {
 })
 export class LoginPage implements OnInit {
   private router = inject(Router);
-  private viewSrvc = inject(ViewServices);
+  private viewSrv = inject(ViewServices);
   private servers = inject(Servers);
   private biometric = inject(Biometric);
 
@@ -66,17 +66,16 @@ export class LoginPage implements OnInit {
       const userLogin = this.loginForm.value as User;
 
       try {
-        await this.servers.singIn(userLogin);
-
-        const availableBio = await this.biometric.isAvailalbe();
-        const bioIsRegister = localStorage.getItem('xionico_auth_cred_id');
-
-        if (availableBio && !bioIsRegister) {
-          await this.biometric.registerBio(userLogin.email);
-          localStorage.setItem('xionico_user_temp', JSON.stringify(userLogin));
-        }
+        await this.servers.singIn(userLogin).then((res) => {
+          this.viewSrv.toastPresent(
+            `Bienvenido ${userLogin.name.toUpperCase()}`,
+            'success'
+          );
+          this.viewSrv.isLogin.set(true);
+          this.router.navigateByUrl('/content');
+        });
       } catch (err: any) {
-        this.viewSrvc.toastPresent(err.message || 'Error', 'danger');
+        this.viewSrv.toastPresent(err.message || 'Error', 'danger');
       }
     }
   }
