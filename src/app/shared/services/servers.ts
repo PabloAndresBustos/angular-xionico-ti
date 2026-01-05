@@ -14,7 +14,6 @@ import {
   arrayRemove,
   arrayUnion,
   setDoc,
-  Firestore,
   getDoc,
   QueryDocumentSnapshot,
   QuerySnapshot,
@@ -169,7 +168,16 @@ private listenToAllServersAdmin() {
   }
 
   async singIn(user: User) {
-    return signInWithEmailAndPassword(getAuth(), user.email, user.password);
+    const credential = await signInWithEmailAndPassword(getAuth(), user.email, user.password);
+    const userId = credential.user.uid;
+
+    const userDoc = await getDoc(doc(getFirestore(), 'users', userId));
+
+    if(userDoc.exists()){
+      return {user: userDoc.data() as User}
+    } else {
+      throw new Error('El usuario no existe o se encuentra pendiente de aprovacion')
+    }
   }
 
   async signOut() {

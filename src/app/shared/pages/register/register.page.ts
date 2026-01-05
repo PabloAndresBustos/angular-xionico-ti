@@ -10,7 +10,7 @@ import {
   alertCircleOutline,
   mailOutline,
   businessOutline,
-  paperPlaneOutline
+  paperPlaneOutline,
 } from 'ionicons/icons';
 import { CustomInputComponent } from '../../components/forms/custom-input/custom-input.component';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
 import { ValidatorFormComponent } from '../../components/forms/validator-form/validator-form.component';
 import { User } from '../../models/user.model';
 import { Servers } from '../../services/servers';
+import { ViewServices } from '../../services/view-services';
 
 @Component({
   selector: 'app-register',
@@ -32,8 +33,9 @@ import { Servers } from '../../services/servers';
   ],
 })
 export class RegisterPage implements OnInit {
-  router = inject(Router);
-  servers = inject(Servers);
+  private router = inject(Router);
+  private servers = inject(Servers);
+  private viewSrvc = inject(ViewServices);
 
   constructor() {
     addIcons({
@@ -44,7 +46,7 @@ export class RegisterPage implements OnInit {
       alertCircleOutline,
       mailOutline,
       businessOutline,
-      paperPlaneOutline
+      paperPlaneOutline,
     });
   }
 
@@ -59,7 +61,6 @@ export class RegisterPage implements OnInit {
     if (this.registerForm.valid) {
       try {
         const user = this.registerForm.value as User;
-
         const newUser = await this.servers.register(user);
 
         await this.servers.createUser(user, newUser.user.uid).then((res) => {
@@ -67,9 +68,9 @@ export class RegisterPage implements OnInit {
           this.servers.signOut();
           this.router.navigateByUrl('/aprobation');
         });
-        console.log('Registro pendiente de aprobacion');
-      } catch (error) {
-        console.log('Error al realizar el registro', error);
+      } catch (error: any) {
+        const msgError = error.message || 'Ocurrió un error inesperado';
+        this.viewSrvc.toastPresent(msgError, 'warning');
       }
     }
   }

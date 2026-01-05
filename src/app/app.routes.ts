@@ -1,8 +1,10 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './shared/services/auth-guard';
 
 export const routes: Routes = [
   {
     path: 'content',
+    canActivate: [authGuard],
     loadComponent: () => import('./shared/pages/content/content.page').then( m => m.ContentPage)
   },
   {
@@ -18,12 +20,13 @@ export const routes: Routes = [
     loadComponent: () => import('./shared/pages/aprobation/aprobation.page').then( m => m.AprobationPage)
   },
   {
+    path: 'admin',
+    canActivate: [authGuard],
+    loadComponent: () => import('./shared/pages/admin/admin.page').then( m => m.AdminPage)
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
-  },
-  {
-    path: 'admin',
-    loadComponent: () => import('./shared/pages/admin/admin.page').then( m => m.AdminPage)
   }
 ];

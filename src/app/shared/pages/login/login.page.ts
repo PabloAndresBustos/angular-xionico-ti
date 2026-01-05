@@ -22,7 +22,7 @@ import {
   personAddOutline,
   fingerPrintOutline,
   alertCircleOutline,
-  mailOutline
+  mailOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -39,9 +39,9 @@ import {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LoginPage implements OnInit {
-  router = inject(Router);
-  viewSrvc = inject(ViewServices);
-  servers = inject(Servers);
+  private router = inject(Router);
+  private viewSrvc = inject(ViewServices);
+  private servers = inject(Servers);
 
   constructor() {
     addIcons({
@@ -51,7 +51,7 @@ export class LoginPage implements OnInit {
       personAddOutline,
       fingerPrintOutline,
       alertCircleOutline,
-      mailOutline
+      mailOutline,
     });
   }
 
@@ -66,13 +66,21 @@ export class LoginPage implements OnInit {
 
   submit() {
     if (this.loginForm.valid) {
-      this.servers.singIn(this.loginForm.value as User).then(res => {
-        console.log(res);
-      }).catch(err => {
-        console.log(err)
-      }).finally(() => {
-        this.router.navigateByUrl('/content');
-      })
+      this.servers
+        .singIn(this.loginForm.value as User)
+        .then((res) => {
+          const userData = res.user;
+          if (userData.approved) {
+            console.log(userData);
+            this.viewSrvc.toastPresent(`Bienvenido ${userData.name.toUpperCase()}`, 'success');
+            this.router.navigateByUrl('/content');
+          } else {
+            this.router.navigateByUrl('/aprobation');
+          }
+        })
+        .catch((err) => {
+          this.viewSrvc.toastPresent('Verifique usuario o contraseña', 'danger');
+        });
     }
   }
 
@@ -80,7 +88,9 @@ export class LoginPage implements OnInit {
     this.router.navigateByUrl('/register');
   }
 
-/*   async authWithFingerprint() {
+
+
+  /*   async authWithFingerprint() {
   try {
     const result = await NativeBiometric.isAvailable();
 
