@@ -1,15 +1,16 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { Auth, authState } from '@angular/fire/auth';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import { doc, getDoc } from '@angular/fire/firestore';
 import { map, switchMap, of, catchError } from 'rxjs';
 import { ViewServices } from './view-services';
+import { Servers } from './servers';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const auth = inject(Auth);
-  const firestore = inject(Firestore);
   const router = inject(Router);
   const viewSrvc = inject(ViewServices);
+  const servers = inject(Servers);
 
   return authState(auth).pipe(
     switchMap((user) => {
@@ -17,15 +18,23 @@ export const authGuard: CanActivateFn = (route, state) => {
         router.navigate(['/login']);
         return of(false);
       }
-
-      return getDoc(doc(firestore, 'users', user.uid));
+      return servers.getUser(user.uid);
     }),
     map((docSnap) => {
       if (typeof docSnap === 'boolean') return docSnap;
 
       const userData = docSnap.data() as any;
+
       if (userData && userData.approved) {
-        return true;
+        const allowedRoles = [1, 2];
+
+        if (allowedRoles.includes(userData.role)) {
+          return true;
+        } else {
+
+          router.navigate(['/content']);
+          return false;
+        }
       } else if (userData && !userData.approved) {
         router.navigate(['/aprobation']);
         return false;

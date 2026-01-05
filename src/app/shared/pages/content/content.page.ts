@@ -82,5 +82,14 @@ export class ContentPage implements OnInit {
     return list.find((s) => s.id === selectedId) || list[0] || null;
   });
 
-  ngOnInit() {}
+  ionViewWillLeave() {
+    const activeEl = document.activeElement as HTMLElement;
+    if (activeEl) {
+      activeEl.blur();
+    }
+  }
+
+  ngOnInit() {
+
+  }
 }

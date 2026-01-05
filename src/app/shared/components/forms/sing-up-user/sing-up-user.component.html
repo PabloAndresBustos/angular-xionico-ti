@@ -1,0 +1,88 @@
+<div class="bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-full">
+
+  <div class="bg-gradient-to-br from-blue-500 to-blue-700 p-6 relative">
+    <div class="flex items-center gap-3">
+      <ion-icon name="person-add-outline" class="text-white text-3xl"></ion-icon>
+      <h2 class="text-white text-xl font-bold tracking-tight">Solicitud de Alta</h2>
+      <span
+        class="ml-auto bg-[#FFC409] text-black text-[10px] font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">
+        Pendiente
+      </span>
+    </div>
+  </div>
+
+  <div class="p-6 space-y-4 flex-grow">
+
+    <div class="space-y-1 opacity-70 grayscale-[50%]">
+      <app-custom-input [inputLabel]="'E-mail'" [value]="user().email" [isPassword]="false" [iconName]="'mail-outline'"
+        [class]="'wfull'" />
+      <app-custom-input [inputLabel]="'Nombre'" [value]="user().name" [isPassword]="false" [iconName]="'person-outline'"
+        [class]="'wfull'" />
+      <app-custom-input [inputLabel]="'Distribuidora Objetivo'" [value]="user().distribuidoraObjetivo"
+        [isPassword]="false" [iconName]="'business-outline'" [class]="'wfull'" />
+    </div>
+
+    <div class="border-b border-gray-200">
+      <ion-item lines="none" class="--background: transparent;">
+        <ion-icon name="checkmark-done-circle-outline" slot="start" color="xionico" class="opacity-60"></ion-icon>
+        <ion-select label="Estado de aprobación" label-placement="floating" [formControl]="getControl('approved')">
+          <ion-select-option [value]="true">Sí</ion-select-option>
+          <ion-select-option [value]="false">No</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+
+    <div class="pt-2 space-y-3">
+      <div class="border-b border-gray-200">
+        <ion-item lines="none" class="--background: transparent;">
+          <ion-icon name="business-outline" slot="start" color="xionico" class="opacity-60"></ion-icon>
+          <ion-select label="Distribuidora Asignada" label-placement="floating"
+            [formControl]="getControl('distribuidoraAsignada')">
+            @for (distId of uniqueDistributors(); track distId) {
+            <ion-select-option [value]="distId">{{ distId }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="border-b border-gray-200">
+        <ion-item lines="none" class="--background: transparent;">
+          <ion-icon name="map-outline" slot="start" color="xionico" class="opacity-60"></ion-icon>
+          <ion-select label="Sucursales" label-placement="floating" multiple="true"
+            [formControl]="getControl('sucursales')">
+            @for (suc of sucursalesFiltradas(); track suc) {
+            <ion-select-option [value]="suc">{{ suc }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="border-b border-gray-200">
+        <ion-item lines="none" class="--background: transparent;">
+          <ion-icon name="layers-outline" slot="start" color="xionico" class="opacity-60"></ion-icon>
+          <ion-select label="Rol del Usuario" label-placement="floating" [formControl]="getControl('role')">
+            <ion-select-option [value]="0">Admin</ion-select-option>
+            <ion-select-option [value]="1">Soporte</ion-select-option>
+            <ion-select-option [value]="2">Usuario</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+    </div>
+
+    <ion-button (click)="onConfirm()" expand="block" color="xionico" class="h-12 mt-6" [disabled]="cardForm.invalid">
+      <ion-icon slot="start" name="person-add-outline"></ion-icon>
+      CONFIRMAR ALTA
+    </ion-button>
+
+    <div class="relative flex py-2 items-center">
+      <div class="flex-grow border-t border-gray-200"></div>
+      <span class="flex-shrink mx-2 text-gray-300 text-xs italic">o</span>
+      <div class="flex-grow border-t border-gray-200"></div>
+    </div>
+
+    <ion-button (click)="onReject()" expand="block" color="danger" class="h-12 font-bold shadow-lg">
+      <ion-icon slot="start" name="trash-outline"></ion-icon>
+      DESCARTAR
+    </ion-button>
+  </div>
+</div>

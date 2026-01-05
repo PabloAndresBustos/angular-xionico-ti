@@ -24,7 +24,9 @@ export class CustomInputComponent  implements OnInit {
   @Input() inputType!:string;
   iconName = input.required<string>();
   inputLabel = input.required<string>();
-  formControlValue = input.required<FormControl>();
+  class = input<string>('mx-auto w-[90%]');
+  value = input<string>('');
+  formControlValue = input<FormControl>();
 
   /* Mostrar o Ocultar Password */
   isPassword = input.required<boolean>();
@@ -35,6 +37,10 @@ export class CustomInputComponent  implements OnInit {
     this.hide ? this.inputType = 'password' : this.inputType = 'text'
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    if (this.value() && !this.formControlValue()?.value) {
+    this.formControlValue()?.setValue(this.value(), { emitEvent: false });
+  }
+  }
 
 }

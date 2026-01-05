@@ -3,6 +3,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CustomInputComponent } from '../../components/forms/custom-input/custom-input.component';
@@ -43,6 +44,8 @@ export class LoginPage implements OnInit {
   private viewSrv = inject(ViewServices);
   private servers = inject(Servers);
   private biometric = inject(Biometric);
+
+  biometricData = signal<boolean>(false);
 
   constructor() {
     addIcons({
@@ -114,6 +117,13 @@ export class LoginPage implements OnInit {
     }
   }
 
+  checkBiometricData(){
+    const bioId = localStorage.getItem('xionico_auth_cred_id');
+    const tempUser = localStorage.getItem('xionico_user_temp');
+
+    this.biometricData.set(!!(bioId && tempUser))
+  }
+
   register() {
     this.router.navigateByUrl('/register');
   }
@@ -125,5 +135,7 @@ export class LoginPage implements OnInit {
     }
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.checkBiometricData();
+  }
 }

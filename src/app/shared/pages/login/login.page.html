@@ -65,12 +65,15 @@
       </form>
     </div>
 
+    @if(biometricData()){
     <div class="mt-12 flex flex-col items-center animate-bounce">
       <ion-button fill="clear" (click)="authenUser()">
         <ion-icon name="finger-print-outline" class="text-6xl" color="xionico"></ion-icon>
       </ion-button>
       <p class="text-xs text-gray-400 font-medium mt-2">Ingreso biométrico</p>
     </div>
+    }
+
 
 
   </div>

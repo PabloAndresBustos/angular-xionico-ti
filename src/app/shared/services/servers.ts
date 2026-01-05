@@ -22,6 +22,7 @@ import {
   QuerySnapshot,
   DocumentData,
   collectionGroup,
+  deleteDoc,
 } from 'firebase/firestore';
 import {
   Auth,
@@ -45,9 +46,14 @@ export class Servers implements OnDestroy {
 
   allServersData = signal<any[]>([]);
   authService = signal<User | null>(null);
+  adminUser = signal<boolean>(false);
+  supportUser = signal<boolean>(false);
+  distribuidoras = signal<any[]>([]);
+  allUsers = signal<User[]>([]);
 
   constructor() {
     this.listenToAuthChanges();
+    this.listenToAllUsers();
   }
 
   private listenToAuthChanges() {
@@ -176,6 +182,10 @@ export class Servers implements OnDestroy {
     }
   }
 
+  async getUser(userId:string){
+    return await getDoc(doc(getFirestore(), 'users', userId));
+  }
+
   async singIn(user: User) {
     const credential = await signInWithEmailAndPassword(
       getAuth(),
@@ -198,6 +208,12 @@ export class Servers implements OnDestroy {
           localStorage.setItem('xionico_user_temp', JSON.stringify(user));
         }
 
+        if (userData.role === 0) {
+          this.adminUser.set(true);
+        }else if(userData.role === 1){
+          this.supportUser.set(true)
+        }
+
         return userData;
       } else {
         this.router.navigateByUrl('/aprobation');
@@ -207,6 +223,16 @@ export class Servers implements OnDestroy {
       this.viewSrv.toastPresent('Verifique usuario o contraseña', 'danger');
       throw new Error('El perfil de usuario no existe en la base de datos');
     }
+  }
+
+  updateDocument(path: string, data: any) {
+    const documentRef = doc(this.db, path);
+    return updateDoc(documentRef, data);
+  }
+
+  deleteDocument(path: string) {
+    const documentRef = doc(this.db, path);
+    return deleteDoc(documentRef);
   }
 
   async signOut() {
@@ -269,6 +295,40 @@ export class Servers implements OnDestroy {
       throw error;
     }
   }
+
+  private listenToAllUsers() {
+    const q = query(collection(this.db, 'users'));
+
+    onSnapshot(q, (snapshot) => {
+      const users = snapshot.docs.map(
+        (doc) =>
+          ({
+            uid: doc.id,
+            ...doc.data(),
+          } as User)
+      );
+      this.allUsers.set(users);
+    });
+  }
+
+  pendingUsers = computed(() => {
+    const users = this.allUsers();
+
+    if (!users) return [];
+
+    return users.filter((user) => user.approved === false);
+  });
+
+  distribuidorasDeServidores = computed(() => {
+    const servidores = this.allServersData();
+    const nombres = servidores
+      .map((s) => s.nombreDistribuidora)
+      .filter(Boolean);
+    return [...new Set(nombres)].map((nombre) => ({
+      id: nombre,
+      nombre: nombre,
+    }));
+  });
 
   ngOnDestroy() {
     if (this.unsubscribeList) {

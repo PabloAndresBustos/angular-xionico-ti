@@ -16,9 +16,16 @@
       </div>
 
       @if (isLogin()) {
-        <div class="flex justify-end">
-        <ion-button fill="clear" (click)="signOut()"
-                    class="logout-button hover:opacity-80 transition-opacity">
+      <div class="flex justify-end">
+        @if(adminOrSupport()){
+        <ion-button  fill="clear" (click)="admin()" class="logout-button hover:opacity-80 transition-opacity">
+          <div class="bg-red-600/20 p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
+            <span class="hidden md:inline text-white text-xs font-bold mr-1">Admin</span>
+            <ion-icon name="people-outline" class="text-white text-xl sm:text-2xl"></ion-icon>
+          </div>
+        </ion-button>
+        }
+        <ion-button fill="clear" (click)="signOut()" class="logout-button hover:opacity-80 transition-opacity">
           <div class="bg-red-600/20 p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
             <span class="hidden md:inline text-white text-xs font-bold mr-1">SALIR</span>
             <ion-icon name="log-out-outline" class="text-white text-xl sm:text-2xl"></ion-icon>
