@@ -21,3 +21,49 @@
     font-family: 'Montserrat', sans-serif;
   }
 }
+
+/* Estilo para el botón de salida */
+.logout-button {
+  --padding-start: 0;
+  --padding-end: 0;
+  margin: 0;
+  height: auto;
+
+  div {
+    /* Efecto de cristal para el botón */
+    background: rgba(220, 38, 38, 0.25);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  ion-icon {
+    color: white;
+  }
+}
+
+/* Asegurar que el toolbar no tenga fondo gris por defecto */
+ion-toolbar {
+  --background: var(--ion-xionico-color);
+  --border-style: none;
+}
+
+/* Ajuste para pantallas muy pequeñas */
+@media (max-width: 360px) {
+  p {
+  font-size: 10px !important;
+  /* CAMBIO: tracking no existe en CSS, usa letter-spacing */
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase;
+}
+
+.logout-btn {
+  --padding-start: 0;
+  --padding-end: 0;
+  margin: 0;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+}

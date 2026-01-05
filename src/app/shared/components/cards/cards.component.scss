@@ -12,7 +12,7 @@
     --color-checked: var(--ion-xionico-color);
     --indicator-color: #ffffff;
     --indicator-height: 100%;
-    --indicator-box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    --indicator-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     --border-radius: 12px;
     margin: 0;
     min-height: auto;
@@ -26,6 +26,12 @@
     }
   }
 
+  .custom-searchbar {
+    --border-radius: 12px;
+    --background: #f4f5f8;
+    padding: 0;
+    margin-bottom: 8px;
+  }
 
   &::part(indicator) {
     border-radius: 50px;
@@ -38,7 +44,6 @@
   }
 }
 
-
 ion-card-title {
   display: flex;
   align-items: center;
@@ -49,7 +54,6 @@ ion-card-title {
 .scroll-container {
   max-height: 900px;
   overflow-y: auto;
-
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -62,7 +66,6 @@ ion-card-title {
     border-radius: 10px;
   }
 }
-
 
 ion-card {
   max-height: 1100px;

@@ -1,6 +1,8 @@
 import { Component, computed, inject, Input, input, OnInit, signal } from '@angular/core';
 import { IonicElementsModule } from '../../modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from '../../modules/components/components-module';
+import { BackupResponse } from '../../models/backup.model';
+import { HardwareInfo } from '../../models/hardware.model';
 import { Servers } from '../../services/servers';
 import { doc, updateDoc,  } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
@@ -21,17 +23,6 @@ import {
   cloudOfflineOutline
 } from 'ionicons/icons';
 
-
-interface HardwareInfo {
-  cpu: { usagePercentage: number; usageRatio: number };
-  ram: { totalGB: string; usedGB: string; usagePercentage: string; usageRatio: number };
-}
-
-interface BackupResponse {
-  lastBackups: any[];
-  backupFoundToday: boolean;
-  error?: string;
-}
 
 @Component({
   selector: 'app-cards',

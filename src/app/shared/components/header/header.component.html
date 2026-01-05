@@ -1,31 +1,30 @@
-<ion-header [translucent]="true" class="ion-no-border">
-  <ion-toolbar color="xionico" class="px-2 py-1">
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-(--ion-xionico-color) px-2 sm:px-4">
+    <div class="grid grid-cols-3 items-center w-full min-h-[64px]">
 
-    <div class="flex items-center justify-between w-full">
-
-      <div class="flex items-center gap-2">
-        <div class="p-2">
-          <img src="/assets/images/logo-alt.svg" alt="Xionico Logo" class="h-8 w-auto">
-        </div>
-
-        <div class="flex flex-col justify-center">
-          <h1 class="text-white text-lg font-bold leading-none" style="margin-bottom: 0;">
-            Backoffice
-          </h1>
-          <p class="text-blue-100 text-[11px] uppercase tracking-[0.2em] font-medium m-0">
-            Soporte TI
-          </p>
-        </div>
+      <div class="flex justify-start">
+        <img src="assets/images/logo-alt.svg" alt="Logo" class="h-8 sm:h-10 w-auto object-contain">
       </div>
 
-      <div class="pr-2">
-        <ion-button (click)="signOut()" color="danger" size="small" class="font-bold m-0 shadow-sm">
-          <ion-icon slot="start" name="log-out-outline" class="mr-2"></ion-icon>
-          <span class="hidden sm:inline">Cerrar Sesión</span>
+      <div class="flex flex-col items-center justify-center text-center">
+        <h1 class="text-white text-lg sm:text-2xl font-bold leading-tight m-0">
+          Backoffice
+        </h1>
+        <p class="text-white/80 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium m-0">
+          Soporte TI
+        </p>
+      </div>
+
+      <div class="flex justify-end">
+        <ion-button fill="clear" (click)="signOut()"
+                    class="logout-button hover:opacity-80 transition-opacity">
+          <div class="bg-red-600/20 p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
+            <span class="hidden md:inline text-white text-xs font-bold mr-1">SALIR</span>
+            <ion-icon name="log-out-outline" class="text-white text-xl sm:text-2xl"></ion-icon>
+          </div>
         </ion-button>
       </div>
 
     </div>
-
   </ion-toolbar>
 </ion-header>
