@@ -264,7 +264,7 @@ export class Servers implements OnDestroy {
       sucursales: [],
     };
 
-    await this.emailSender(user, uid);
+    /* await this.emailSender(user, uid); */
 
     return setDoc(userDoc, userProfile);
   }
@@ -274,7 +274,7 @@ export class Servers implements OnDestroy {
     const deleteUserFn = httpsCallable(functions, 'deleteAuthUser');
 
     try {
-      await deleteUserFn(userId);
+      await deleteUserFn({uid: userId});
       console.log('Usuario eliminado');
     } catch (error) {
       console.log('Error al eliminar el usuario');
