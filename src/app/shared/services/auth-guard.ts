@@ -18,23 +18,17 @@ export const authGuard: CanActivateFn = (route, state) => {
         router.navigate(['/login']);
         return of(false);
       }
-      return servers.getUser(user.uid);
+
+      const getUser = servers.getUser(user.uid);
+
+      return getUser;
     }),
     map((docSnap) => {
       if (typeof docSnap === 'boolean') return docSnap;
 
       const userData = docSnap.data() as any;
-
       if (userData && userData.approved) {
-        const allowedRoles = [1, 2];
-
-        if (allowedRoles.includes(userData.role)) {
-          return true;
-        } else {
-
-          router.navigate(['/content']);
-          return false;
-        }
+        return true;
       } else if (userData && !userData.approved) {
         router.navigate(['/aprobation']);
         return false;
