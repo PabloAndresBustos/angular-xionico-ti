@@ -6,6 +6,7 @@ import emailjs from '@emailjs/browser';
 import { Router } from '@angular/router';
 import { ViewServices } from './view-services';
 import { Biometric } from './biometric';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import {
   getFirestore,
   collection,
@@ -266,6 +267,19 @@ export class Servers implements OnDestroy {
     await this.emailSender(user, uid);
 
     return setDoc(userDoc, userProfile);
+  }
+
+  async deleteUser(userId:string){
+    const functions = getFunctions();
+    const deleteUserFn = httpsCallable(functions, 'deleteAuthUser');
+
+    try {
+      await deleteUserFn(userId);
+      console.log('Usuario eliminado');
+    } catch (error) {
+      console.log('Error al eliminar el usuario');
+    }
+
   }
 
   async emailSender(user: User, userId: string) {

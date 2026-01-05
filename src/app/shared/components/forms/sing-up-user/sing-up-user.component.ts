@@ -94,6 +94,7 @@ export class SingUpUserComponent implements OnInit {
 
     try {
       await this.servers.deleteDocument(path);
+      await this.servers.deleteUser(this.user().uid)
       console.log('Solicitud eliminada correctamente');
     } catch (error) {
       console.error('Error al eliminar:', error);
