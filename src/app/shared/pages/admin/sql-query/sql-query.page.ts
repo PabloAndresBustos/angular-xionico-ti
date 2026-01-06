@@ -32,6 +32,7 @@ export class SqlQueryPage implements OnInit {
   selectedServer = signal<any>(null);
   isReady = signal(false);
   isExecuting = signal(false);
+  queryData = signal<any[]>([]);
 
   selectedIp = '';
   selectedDbName = '';
@@ -40,12 +41,39 @@ export class SqlQueryPage implements OnInit {
   public servers = inject(Servers);
 
   constructor() {
-    effect(() => {
-      const status = this.lastCommand()?.status;
-      if (status === 'SUCCESS' || status === 'ERROR') {
-        this.isExecuting.set(false);
-      }
-    });
+    effect(
+      () => {
+        const server = this.selectedServer();
+        const current = this.servers
+          .allServersData()
+          .find((s) => s.id === server?.id);
+        const command = current?.lastCommand;
+
+        if (!command) return;
+
+        if (command.status === 'PENDING') {
+          this.isExecuting.set(true);
+          this.queryData.set([]);
+          return;
+        }
+
+        if (command.status === 'SUCCESS' || command.status === 'FINISHED') {
+          this.isExecuting.set(false);
+
+          const currentData = JSON.stringify(this.queryData());
+          const newData = JSON.stringify(command.results || []);
+
+          if (currentData !== newData) {
+            this.queryData.set(command.results || []);
+          }
+        }
+
+        if (command.status === 'ERROR') {
+          this.isExecuting.set(false);
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   ngOnInit() {

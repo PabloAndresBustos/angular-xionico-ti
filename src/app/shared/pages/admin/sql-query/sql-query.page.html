@@ -65,13 +65,15 @@
   <div class="mt-6 overflow-x-auto border border-gray-200 rounded-lg shadow-xl bg-white">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-800">
-        <tr>
-          @for (key of Object.keys(queryResults()[0]); track key) {
-          <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-            {{ key }}
-          </th>
+        @for (row of queryData(); track $index) {
+        <tr class="hover:bg-gray-50">
+          @for (key of Object.keys(row); track key) {
+          <td class="px-4 py-2 text-sm text-gray-600">
+            {{ row[key] }}
+          </td>
           }
         </tr>
+        }
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
         @for (row of queryResults(); track $index) {
