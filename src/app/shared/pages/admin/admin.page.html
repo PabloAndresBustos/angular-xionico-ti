@@ -10,7 +10,7 @@
       <ion-item button (click)="selectionMenu('pending')">
         <ion-icon slot="start" name="person-add-outline"></ion-icon>
         <ion-label>Altas Pendientes</ion-label>
-        <ion-badge slot="end" color="warning">{{ pendingUsers().length }}</ion-badge>
+        <ion-badge slot="end" color="warning" class="flex items-center justify-center h-[22px] w-[22px] rounded-full text-[12px] font-bold p-0">{{ pendingUsers().length }}</ion-badge>
       </ion-item>
 
       <ion-item button (click)="selectionMenu('active')">

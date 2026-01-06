@@ -193,7 +193,7 @@ export class Servers implements OnDestroy {
 
     if (!users || users.length === 0) return [];
 
-    return users.filter((user) => user.approved === true);
+    return users.filter((user) => user.approved === true && user.active === true);
   });
 
   async singIn(user: User) {
@@ -275,6 +275,7 @@ export class Servers implements OnDestroy {
       distribuidoraAsignada: '',
       distribuidoraObjetivo: user.distribuidoraObjetivo,
       sucursales: [],
+      active: true,
     };
 
     await this.emailSender(user, uid);
@@ -342,7 +343,7 @@ export class Servers implements OnDestroy {
 
     if (!users) return [];
 
-    return users.filter((user) => user.approved === false);
+    return users.filter((user) => user.approved === false && user.active === true);
   });
 
   distribuidorasDeServidores = computed(() => {

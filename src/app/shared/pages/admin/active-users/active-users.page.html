@@ -1,8 +1,17 @@
 <app-section [title]="'USUARIOS ACTIVOS'" [subTitle]="''" [data]="[]" [serversInSelectedDist]="[]" [selectedServerId]="''"
   [status]="false" [iconName]="'people-outline'">
 </app-section>
+<div class="px-4 mb-6">
+  <ion-searchbar
+    placeholder="Buscar por nombre o email..."
+    (ionInput)="handleSearch($event)"
+    class="max-w-2xl mx-auto custom-searchbar"
+    mode="ios"
+    animated="true">
+  </ion-searchbar>
+</div>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-max">
-  @for (user of approvedUsers(); track user.uid) {
+  @for (user of filteredUsers(); track user.uid) {
   <app-sing-up-user
     [user]="user"
     [allServers]="allServerData()"

@@ -86,6 +86,7 @@ export class SingUpUserComponent implements OnInit {
       const updateData = {
         ...this.cardForm.getRawValue(),
         approved: true,
+        active: true
       };
 
       await this.servers.updateDocument(path, updateData);
@@ -100,6 +101,7 @@ export class SingUpUserComponent implements OnInit {
     try {
       const updateData = {
         approved: false,
+        active: false,
       }
       await this.servers.updateDocument(path, updateData);
       console.log('Solicitud eliminada correctamente');
@@ -121,6 +123,7 @@ export class SingUpUserComponent implements OnInit {
       sucursales: new FormControl({ value: [], disabled: true }),
       role: new FormControl(2),
       approved: new FormControl(true),
+      deleted: new FormControl(this.user().active || false)
     });
 
     const userData = this.user();

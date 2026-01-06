@@ -1,10 +1,19 @@
-import { Component, computed, inject, Input, input, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  Input,
+  input,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { IonicElementsModule } from '../../modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from '../../modules/components/components-module';
 import { BackupResponse } from '../../models/backup.model';
 import { HardwareInfo } from '../../models/hardware.model';
+import { Transferencias } from '../../models/trasnsferencias.models';
 import { Servers } from '../../services/servers';
-import { doc, updateDoc,  } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
 import {
   thumbsUp,
@@ -20,9 +29,8 @@ import {
   speedometerOutline,
   hardwareChipOutline,
   warningOutline,
-  cloudOfflineOutline
+  cloudOfflineOutline,
 } from 'ionicons/icons';
-
 
 @Component({
   selector: 'app-cards',
@@ -39,6 +47,7 @@ export class CardsComponent implements OnInit {
   disks = input<any[]>();
   backups = input<BackupResponse | null>();
   hardware = input<HardwareInfo | null>(null);
+  transferencias = input<Transferencias | null>(null);
   serverData = input<any>();
   selectedTab = signal<string>('Recomendados');
   filterText = signal<string>('');
@@ -63,7 +72,7 @@ export class CardsComponent implements OnInit {
       speedometerOutline,
       hardwareChipOutline,
       warningOutline,
-      cloudOfflineOutline
+      cloudOfflineOutline,
     });
   }
 
@@ -115,18 +124,31 @@ export class CardsComponent implements OnInit {
     }
   }
 
-  async toggleFav(service:any){
+  async toggleFav(service: any) {
     await this.servers.selectRecommended(
-      service.id, this.SERVER_ID(), this.DISTRIBUIDORA_ID(), service.isRecommended
-    )
+      service.id,
+      this.SERVER_ID(),
+      this.DISTRIBUIDORA_ID(),
+      service.isRecommended
+    );
   }
 
-  serviceStatus(service: any){
+  serviceStatus(service: any) {
     if (service === 'RUNNING') {
-      return 'EN EJECUCION'
-    }else{
-      return 'DETENIDO'
+      return 'EN EJECUCION';
+    } else {
+      return 'DETENIDO';
     }
+  }
+
+  formatDate(dateStr: string | undefined): string {
+    if (!dateStr || dateStr.length !== 8) return 'Fecha no disponible';
+
+    const year = dateStr.substring(0, 4);
+    const month = dateStr.substring(4, 6);
+    const day = dateStr.substring(6, 8);
+
+    return `${day}-${month}-${year}`;
   }
 
   displayServices = computed(() => {
@@ -134,22 +156,24 @@ export class CardsComponent implements OnInit {
     const tab = this.selectedTab();
     const search = this.filterText().toLowerCase().trim();
 
-    let list = tab === 'Recomendados' ?
-               (data.serviciosRecomendados || []) :
-               (data.serviciosGeneral || []);
+    let list =
+      tab === 'Recomendados'
+        ? data.serviciosRecomendados || []
+        : data.serviciosGeneral || [];
 
     if (search) {
-      list = list.filter((s: any) =>
-        s.name.toLowerCase().includes(search)
-      );
+      list = list.filter((s: any) => s.name.toLowerCase().includes(search));
     }
 
     return list;
   });
 
-  totalRecomendados = computed(() => this.serverData()?.serviciosRecomendados?.length || 0);
-  totalGeneral = computed(() => this.serverData()?.serviciosGeneral?.length || 0);
-
+  totalRecomendados = computed(
+    () => this.serverData()?.serviciosRecomendados?.length || 0
+  );
+  totalGeneral = computed(
+    () => this.serverData()?.serviciosGeneral?.length || 0
+  );
 
   ngOnInit() {}
 }

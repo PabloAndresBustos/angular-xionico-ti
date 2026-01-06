@@ -8,4 +8,5 @@ export interface User {
   distribuidoraAsignada?:string,
   sucursales:string[]
   distribuidoraObjetivo: string
+  active: boolean,
 }

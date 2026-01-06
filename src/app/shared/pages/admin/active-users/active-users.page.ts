@@ -1,4 +1,4 @@
-import { Component, input, OnInit } from '@angular/core';
+import { Component, computed, input, OnInit, signal } from '@angular/core';
 import { IonicElementsModule } from 'src/app/shared/modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from 'src/app/shared/modules/components/components-module';
 import { User } from 'src/app/shared/models/user.model';
@@ -10,16 +10,36 @@ import { SectionComponent } from 'src/app/shared/components/section/section.comp
   templateUrl: './active-users.page.html',
   styleUrls: ['./active-users.page.scss'],
   standalone: true,
-  imports: [IonicElementsModule, ComponentsModule, SingUpUserComponent, SectionComponent]
+  imports: [
+    IonicElementsModule,
+    ComponentsModule,
+    SingUpUserComponent,
+    SectionComponent,
+  ],
 })
 export class ActiveUsersPage implements OnInit {
-
   approvedUsers = input.required<User[]>();
   allServerData = input.required<User[]>();
+  searchTerm = signal<string>('');
 
-  constructor() { }
+  filteredUsers = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const users = this.approvedUsers();
 
-  ngOnInit() {
+    if (!term) return users;
+
+    return users.filter(
+      (user) =>
+        user.name?.toLowerCase().includes(term) ||
+        user.email?.toLowerCase().includes(term)
+    );
+  });
+
+  handleSearch(event: any) {
+    this.searchTerm.set(event.detail.value);
   }
 
+  constructor() {}
+
+  ngOnInit() {}
 }
