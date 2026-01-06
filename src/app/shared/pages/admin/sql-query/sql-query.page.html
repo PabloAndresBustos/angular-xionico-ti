@@ -1,8 +1,112 @@
-<app-section [title]="'CONSULTAS SQL'" [subTitle]="''" [data]="[]" [serversInSelectedDist]="[]" [selectedServerId]="''"
-  [status]="false" [iconName]="'server-outline'">
-</app-section>
-<div>
-  <span>
-    PROXIMAMENTE
-  </span>
+<app-section [title]="'CONSULTAS SQL'" [iconName]="'server-outline'" [data]="false" [subTitle]="''"
+  [status]="false"></app-section>
+
+@if (isReady()) {
+<div class="p-4 mx-auto w-full h-[40%]">
+  <ion-card class="m-0 shadow-lg">
+    <ion-card-content class="space-y-4">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <ion-item lines="outline">
+          <ion-label position="stacked">Distribuidora</ion-label>
+          <ion-select (ionChange)="onDistChange($event)" placeholder="Seleccione">
+            @for (dist of (servers.distribuidorasDeServidores() || []); track dist.id) {
+            <ion-select-option [value]="dist.id">{{ dist.nombre }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+
+        <ion-item lines="outline" [disabled]="!selectedDist()">
+          <ion-label position="stacked">Sucursal</ion-label>
+          <ion-select (ionChange)="onServerChange($event)" placeholder="Seleccione">
+            @for (server of (serversInDist() || []); track server.id) {
+            <ion-select-option [value]="server">{{ server.nombreServidor }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+
+        <ion-item lines="outline" class="rounded-lg" [disabled]="selectedDist() !== 'AMERICA' || !selectedServer()">
+          <ion-label position="stacked" class="font-bold text-primary">Sucursal Destino (IP)</ion-label>
+          <ion-select placeholder="Seleccione..." [(ngModel)]="selectedIp">
+            @for (item of availableIps(); track item.ip) {
+            <ion-select-option [value]="item.ip">
+              {{ item.nombre }} ({{ item.ip }})
+            </ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+
+        <ion-item lines="outline" [disabled]="!selectedServer()">
+          <ion-label position="stacked">Base de Datos</ion-label>
+          <ion-select [(ngModel)]="selectedDbName" placeholder="Base">
+            <ion-select-option value="ArcorGEV5">ArcorGEV5</ion-select-option>
+            <ion-select-option value="ArcorGEV5Reparto">ArcorGEV5Reparto</ion-select-option>
+            <ion-select-option value="ArcorPDA">ArcorPDA</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="mt-4">
+        <textarea [(ngModel)]="queryText" placeholder="Escriba su consulta SQL aquí..."
+          class="w-full h-80 p-6 font-mono text-base bg-gray-900 rounded-lg outline-none border-2 border-gray-700 focus:border-blue-500 transition-all custom-textarea">
+        </textarea>
+      </div>
+
+      <div class="flex justify-end">
+        <ion-button (click)="ejecutarConsulta()" [disabled]="!canExecute() || isExecuting()">
+          <ion-icon [name]="isExecuting() ? 'hourglass-outline' : 'play-outline'" slot="start"></ion-icon>
+          {{ isExecuting() ? 'PROCESANDO...' : 'EJECUTAR CONSULTA' }}
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  @if (queryResults().length > 0) {
+  <div class="mt-6 overflow-x-auto border border-gray-200 rounded-lg shadow-xl bg-white">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-800">
+        <tr>
+          @for (key of Object.keys(queryResults()[0]); track key) {
+          <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+            {{ key }}
+          </th>
+          }
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        @for (row of queryResults(); track $index) {
+        <tr class="hover:bg-blue-50 transition-colors">
+          @for (key of Object.keys(row); track key) {
+          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-r border-gray-100 last:border-0">
+            {{ row[key] }}
+          </td>
+          }
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  } @else if (lastCommand()?.status === 'PENDING') {
+  <div
+    class="flex flex-col items-center justify-center p-12 text-blue-600 bg-blue-50 rounded-xl mt-6 border border-blue-100">
+    <ion-spinner name="dots" color="primary"></ion-spinner>
+    <span class="mt-4 font-semibold italic text-lg">Consultando servidor remoto...</span>
+  </div>
+  } @else if (lastCommand()?.status === 'ERROR') {
+  <div class="p-6 mt-6 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-sm">
+    <div class="flex items-center mb-2">
+      <ion-icon name="warning" class="text-2xl mr-2"></ion-icon>
+      <strong class="text-lg">Error en la base de datos</strong>
+    </div>
+    <pre
+      class="bg-white p-4 rounded border border-red-100 overflow-x-auto text-sm font-mono">{{ lastCommand()?.error }}</pre>
+  </div>
+  }
 </div>
+
+} @else {
+<div class="flex flex-col justify-center items-center h-64">
+  <ion-spinner name="crescent" color="primary"></ion-spinner>
+  <p class="mt-4 text-gray-500 animate-pulse font-medium">Cargando módulos de consulta...</p>
+</div>
+}

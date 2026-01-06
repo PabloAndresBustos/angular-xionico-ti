@@ -14,15 +14,17 @@ import { User } from '../../models/user.model';
 import { UsersSingUpPage } from './users-sing-up/users-sing-up.page';
 import { ActiveUsersPage } from './active-users/active-users.page';
 import { SqlQueryPage } from "./sql-query/sql-query.page";
+import { DistribuidorasPage } from "./distribuidoras/distribuidoras.page";
 import { MenuController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   peopleCircleOutline,
   fileTrayStackedOutline,
   lockClosedOutline,
-  serverOutline
+  serverOutline,
+  hourglassOutline,
+  playOutline
 } from 'ionicons/icons';
-import { DistribuidorasPage } from "./distribuidoras/distribuidoras.page";
 
 
 @Component({
@@ -53,7 +55,9 @@ export class AdminPage implements OnInit, OnDestroy {
       fileTrayStackedOutline,
       peopleCircleOutline,
       lockClosedOutline,
-      serverOutline
+      serverOutline,
+      hourglassOutline,
+      playOutline
     });
   }
 
@@ -93,7 +97,6 @@ export class AdminPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.viewSrv.isAdminPanel.set(true);
-    console.log(this.servers.approvedUsers());
   }
 
   ngOnDestroy(): void {

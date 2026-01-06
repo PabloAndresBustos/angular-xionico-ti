@@ -126,9 +126,9 @@ export class CardsComponent implements OnInit {
 
   async toggleFav(service: any) {
     await this.servers.selectRecommended(
-      service.id,
-      this.SERVER_ID(),
       this.DISTRIBUIDORA_ID(),
+      this.SERVER_ID(),
+      service.id,
       service.isRecommended
     );
   }

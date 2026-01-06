@@ -1,0 +1,15 @@
+.custom-textarea {
+  color: #00e5ff;
+  resize: vertical;
+  line-height: 1.5;
+  caret-color: white;
+
+  &::placeholder {
+    color: #4b5563;
+  }
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
