@@ -19,13 +19,14 @@ import {
   cloudOutline
 } from 'ionicons/icons';
 import { CardsComponent } from '../../components/cards/cards.component';
+import { SectionComponent } from '../../components/section/section.component';
 
 @Component({
   selector: 'app-content',
   templateUrl: './content.page.html',
   styleUrls: ['./content.page.scss'],
   standalone: true,
-  imports: [IonicElementsModule, ComponentsModule, CardsComponent],
+  imports: [IonicElementsModule, ComponentsModule, CardsComponent, SectionComponent],
 })
 export class ContentPage implements OnInit {
   private serversSrvc = inject(Servers);

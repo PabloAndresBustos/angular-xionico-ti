@@ -17,6 +17,56 @@
 
   <div class="p-4 px-0 lg:p-6">
     @if (activeServer(); as data) {
+      <app-section
+        [title]="data.nombreDistribuidora"
+        [subTitle]="'Panel de Control Central'"
+        [data]="data"
+        [serversInSelectedDist]="serversInSelectedDist()"
+        [(selectedServerId)]="selectedServerId"
+        [status]="true"
+        [iconName]="'business-outline'"
+        >
+      </app-section> <div class="bg-white rounded-b-3xl p-6 shadow-xl border-x border-b border-gray-100 px-0 lg:p-4">
+        <ion-grid class="ion-no-padding">
+          <ion-row class="gap-6">
+            <ion-col size="12" size-lg="7">
+              <app-cards [title]="'Servicios'" [type]="'services'" [serverData]="data"
+                [colNames]="['Favorito', 'Nombre', 'Estado', 'Acción']" [DISTRIBUIDORA_ID]="data.nombreDistribuidora"
+                [SERVER_ID]="data.nombreServidor"/>
+            </ion-col>
+
+            <ion-col size="12" size-lg="">
+              <div class="flex flex-col gap-6">
+                <app-cards [title]="'Hardware'" [type]="'hardware'" [hardware]="data.hardware" />
+                <app-cards [title]="'Salud Almacenamiento'" [type]="'disk'" [disks]="data.disk_status" />
+                <app-cards [title]="'Backups'" [type]="'backups'" [backups]="data.backups" />
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+    } </div>
+</ion-content>
+
+<!-- <app-header />
+
+<ion-content class="bg-gray-50">
+
+  @if (availableDistributors().length > 1) {
+  <div class="flex justify-start px-4 lg:px-6 pt-4 bg-white">
+    <ion-segment [value]="selectedDistributor()" (ionChange)="selectedDistributor.set($any($event).detail.value!)"
+      mode="ios" scrollable="true" class="distributor-pill-segment">
+      @for (dist of availableDistributors(); track dist) {
+      <ion-segment-button [value]="dist">
+        <ion-label class="font-bold">{{ dist }}</ion-label>
+      </ion-segment-button>
+      }
+    </ion-segment>
+  </div>
+  }
+
+  <div class="p-4 px-0 lg:p-6">
+    @if (activeServer(); as data) {
     <section class="bg-gradient-to-r from-(--ion-xionico-color) to-blue-700 rounded-t-3xl p-6 shadow-lg text-white">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-4">
@@ -75,3 +125,4 @@
     }
   </div>
 </ion-content>
+ -->

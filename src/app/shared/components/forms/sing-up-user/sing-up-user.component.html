@@ -3,10 +3,10 @@
   <div class="bg-gradient-to-br from-blue-500 to-blue-700 p-6 relative">
     <div class="flex items-center gap-3">
       <ion-icon name="person-add-outline" class="text-white text-3xl"></ion-icon>
-      <h2 class="text-white text-xl font-bold tracking-tight">Solicitud de Alta</h2>
+      <h2 class="text-white text-xl font-bold tracking-tight">{{title()}}</h2>
       <span
         class="ml-auto bg-[#FFC409] text-black text-[10px] font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">
-        Pendiente
+        {{ user().approved ? 'Activo' : 'Pendiente' }}
       </span>
     </div>
   </div>
@@ -48,7 +48,7 @@
 
     <ion-button (click)="onConfirm()" expand="block" color="xionico" class="h-12 mt-6" [disabled]="cardForm.invalid">
       <ion-icon slot="start" name="person-add-outline"></ion-icon>
-      CONFIRMAR ALTA
+      {{okButton()}}
     </ion-button>
 
     <div class="relative flex py-2 items-center">
@@ -59,7 +59,7 @@
 
     <ion-button (click)="onReject()" expand="block" color="danger" class="h-12 font-bold shadow-lg">
       <ion-icon slot="start" name="trash-outline"></ion-icon>
-      DESCARTAR
+      {{redButton()}}
     </ion-button>
   </div>
 </div>

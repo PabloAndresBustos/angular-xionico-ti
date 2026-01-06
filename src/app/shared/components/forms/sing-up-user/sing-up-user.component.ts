@@ -38,9 +38,15 @@ import { CustomSelectComponent } from '../custom-select/custom-select.component'
   ],
 })
 export class SingUpUserComponent implements OnInit {
+
   user = input.required<User>();
   allServers = input<any[]>([]);
+  title = input.required<string>();
+  okButton = input.required<string>();
+  redButton = input.required<string>();
   selectedDist = signal<string>('');
+
+
   private servers = inject(Servers);
 
   cardForm!: FormGroup;

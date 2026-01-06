@@ -1,0 +1,38 @@
+<section class="bg-gradient-to-r from-(--ion-xionico-color) to-blue-700 rounded-t-3xl p-6 shadow-lg text-white mb-4">
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-4">
+      <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-md">
+        <ion-icon [name]="iconName()" class="text-3xl"></ion-icon>
+      </div>
+      <div>
+        <h1 class="text-3xl font-black m-0 tracking-tight uppercase">
+          {{ title() }}
+        </h1>
+        @if(subTitle()) {
+        <p class="text-blue-100 text-xs uppercase tracking-widest font-bold opacity-80">
+          {{ subTitle() }}
+        </p>
+        }
+      </div>
+    </div>
+    @if(status()){
+    <div
+      [class]="data().online ? 'bg-green-500/20 text-green-300 border-green-500/30' : 'bg-red-500/20 text-red-300 border-red-500/30'"
+      class="flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold">
+      <span class="w-2 h-2 rounded-full" [class]="data().online ? 'bg-green-400 animate-pulse' : 'bg-red-400'"></span>
+      {{ data().online ? 'EN LÍNEA' : 'DESCONECTADO' }}
+    </div>
+    }
+  </div>
+  @if(selectedServerId().length > 0) {
+   <div class="flex justify-start mt-4">
+    <ion-segment [value]="selectedServerId()" (ionChange)="onSegmentChange($event)" mode="ios" class="pill-segment">
+      @for (server of serversInSelectedDist(); track server.id) {
+      <ion-segment-button [value]="server.id">
+        <ion-label>ID: {{ server.nombreServidor }}</ion-label>
+      </ion-segment-button>
+      }
+    </ion-segment>
+  </div>
+  }
+</section>

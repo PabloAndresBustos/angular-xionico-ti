@@ -1,0 +1,19 @@
+<app-section [title]="'SOLICTUDES DE ALTA'" [subTitle]="''" [data]="[]" [serversInSelectedDist]="[]" [selectedServerId]="''"
+  [status]="false" [iconName]="'person-add-outline'"> >
+</app-section>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-max">
+    @for (user of pendingUsers(); track user.uid) {
+    <app-sing-up-user
+      [user]="user"
+      [allServers]="allServerData()"
+      [title]="'Solicitudes de alta'"
+      [okButton]="'CONFIRMAR ALTA'"
+      [redButton]="'DESCARTAR'"
+      />
+    } @empty {
+    <div class="col-span-full flex flex-col items-center justify-center mt-20 text-gray-400">
+      <ion-icon name="people-outline" class="text-6xl mb-4 opacity-20"></ion-icon>
+      <p class="text-lg font-medium">No hay usuarios pendientes de aprobación</p>
+    </div>
+    }
+  </div>

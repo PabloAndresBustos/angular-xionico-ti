@@ -2,7 +2,10 @@
   <ion-toolbar class="bg-(--ion-xionico-color) px-2 sm:px-4">
     <div class="grid grid-cols-3 items-center w-full min-h-[64px]">
 
-      <div class="flex justify-start">
+      <div class="flex items-center justify-start gap-2">
+        @if (isAdminPanel() && adminOrSupport()) {
+          <ion-menu-button color="light" class="m-0"></ion-menu-button>
+        }
         <img src="assets/images/logo-alt.svg" alt="Logo" class="h-8 sm:h-10 w-auto object-contain">
       </div>
 
@@ -16,32 +19,28 @@
       </div>
 
       @if (isLogin()) {
-      <div class="flex justify-end">
+      <div class="flex justify-end gap-1 sm:gap-2">
         @if(adminOrSupport()){
-        @if(isAdminPanel()){
-        <ion-button fill="clear" (click)="back()" class="logout-button hover:opacity-80 transition-opacity">
-          <div class="bg-red-600/20 p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
-            <ion-icon name="arrow-back-outline" class="text-white text-xl sm:text-2xl" slot="icon-only"></ion-icon>
+        <ion-button fill="clear" (click)="isAdminPanel() ? back() : admin()" class="logout-button hover:opacity-80 transition-opacity">
+          <div class="bg-red-600/20 p-1.5 sm:p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
+            @if(isAdminPanel()){
+              <ion-icon name="arrow-back-outline" class="text-white text-xl sm:text-2xl" slot="icon-only"></ion-icon>
+            }@else{
+              <span class="hidden md:inline text-white text-[10px] font-bold mr-1">Admin</span>
+              <ion-icon name="people-outline" class="text-white text-xl sm:text-2xl"></ion-icon>
+            }
           </div>
         </ion-button>
         }
-        <ion-button fill="clear" (click)="admin()" class="logout-button hover:opacity-80 transition-opacity">
-          <div class="bg-red-600/20 p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
-            <span class="hidden md:inline text-white text-xs font-bold mr-1">Admin</span>
-            <ion-icon name="people-outline" class="text-white text-xl sm:text-2xl"></ion-icon>
-          </div>
-        </ion-button>
-        }
+
         <ion-button fill="clear" (click)="signOut()" class="logout-button hover:opacity-80 transition-opacity">
-          <div class="bg-red-600/20 p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
-            <span class="hidden md:inline text-white text-xs font-bold mr-1">SALIR</span>
+          <div class="bg-red-600/20 p-1.5 sm:p-2 rounded-xl border border-red-500/30 flex items-center gap-2">
+            <span class="hidden md:inline text-white text-[10px] font-bold mr-1">SALIR</span>
             <ion-icon name="log-out-outline" class="text-white text-xl sm:text-2xl"></ion-icon>
           </div>
         </ion-button>
       </div>
       }
-
-
     </div>
   </ion-toolbar>
 </ion-header>

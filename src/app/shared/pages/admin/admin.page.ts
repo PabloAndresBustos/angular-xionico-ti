@@ -1,31 +1,71 @@
-import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { IonicElementsModule } from '../../modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from '../../modules/components/components-module';
 import { Servers } from '../../services/servers';
-import { SingUpUserComponent } from "../../components/forms/sing-up-user/sing-up-user.component";
 import { ViewServices } from '../../services/view-services';
 import { User } from '../../models/user.model';
+import { UsersSingUpPage } from './users-sing-up/users-sing-up.page';
+import { ActiveUsersPage } from './active-users/active-users.page';
+import { SqlQueryPage } from "./sql-query/sql-query.page";
+import { MenuController } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import {
+  peopleCircleOutline,
+  fileTrayStackedOutline,
+  lockClosedOutline,
+  serverOutline
+} from 'ionicons/icons';
+import { DistribuidorasPage } from "./distribuidoras/distribuidoras.page";
+
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.page.html',
   styleUrls: ['./admin.page.scss'],
   standalone: true,
-  imports: [IonicElementsModule, ComponentsModule, SingUpUserComponent],
+  imports: [
+    IonicElementsModule,
+    ComponentsModule,
+    UsersSingUpPage,
+    ActiveUsersPage,
+    SqlQueryPage,
+    DistribuidorasPage
+],
 })
 export class AdminPage implements OnInit, OnDestroy {
-
   servers = inject(Servers);
   private viewSrv = inject(ViewServices);
+  private menu = inject(MenuController);
   public rawUsers = signal<User[]>([]);
+  activeSection = signal<'pending' | 'active' | 'sql' | 'distribuidoras'>('pending');
+  filterText = signal<string>('');
   private unsubscribeUsers?: () => void;
 
-  constructor() {}
+  constructor() {
+    addIcons({
+      fileTrayStackedOutline,
+      peopleCircleOutline,
+      lockClosedOutline,
+      serverOutline
+    });
+  }
 
   opcionesAprobar = [
     { label: 'Sí', value: true },
     { label: 'No', value: false },
   ];
+
+  async selectionMenu(section: 'pending' | 'active' | 'sql' | 'distribuidoras') {
+    this.activeSection.set(section);
+    await this.menu.close('main-content');
+  }
 
   distribuidoras() {
     return this.servers.distribuidorasDeServidores();
@@ -39,25 +79,25 @@ export class AdminPage implements OnInit, OnDestroy {
     return this.servers.allServersData();
   }
 
-  supportUser(){
-    return this.servers.supportUser()
+  supportUser() {
+    return this.servers.supportUser();
   }
 
-  adminUser(){
+  adminUser() {
     return this.servers.adminUser();
   }
 
-  approvedUsers(){
+  approvedUsers() {
     return this.servers.approvedUsers();
   }
 
   ngOnInit() {
-    this.viewSrv.isAdminPanel.set(true)
-    console.log(this.servers.approvedUsers())
+    this.viewSrv.isAdminPanel.set(true);
+    console.log(this.servers.approvedUsers());
   }
 
   ngOnDestroy(): void {
-    this.viewSrv.isAdminPanel.set(false)
+    this.viewSrv.isAdminPanel.set(false);
     if (this.unsubscribeUsers) this.unsubscribeUsers();
   }
 }

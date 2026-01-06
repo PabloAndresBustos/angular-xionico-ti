@@ -29,7 +29,10 @@ import {
   IonProgressBar,
   IonSearchbar,
   IonNote,
-  IonText
+  IonText,
+  IonBadge,
+  IonMenu,
+  IonMenuButton
 } from '@ionic/angular/standalone';
 
 @NgModule({
@@ -64,7 +67,10 @@ import {
     IonProgressBar,
     IonSearchbar,
     IonNote,
-    IonText
+    IonText,
+    IonBadge,
+    IonMenu,
+    IonMenuButton
   ],
   exports: [
     CommonModule,
@@ -96,7 +102,10 @@ import {
     IonProgressBar,
     IonSearchbar,
     IonNote,
-    IonText
+    IonText,
+    IonBadge,
+    IonMenu,
+    IonMenuButton
   ],
 })
 export class IonicElementsModule {}
