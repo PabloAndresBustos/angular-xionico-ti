@@ -24,6 +24,7 @@ import {
   DocumentData,
   collectionGroup,
   deleteDoc,
+  getDocs,
 } from 'firebase/firestore';
 import {
   Auth,
@@ -183,8 +184,20 @@ export class Servers implements OnDestroy {
     }
   }
 
-  async getUser(userId:string){
+  async getUser(userId: string) {
     return await getDoc(doc(getFirestore(), 'users', userId));
+  }
+
+  getUsersRealTime(callback: (users: any[]) => void) {
+    const q = query(collection(getFirestore(), 'users'));
+
+    return onSnapshot(q, (snapshot) => {
+      const users = snapshot.docs.map((doc) => ({
+        uid: doc.id,
+        ...doc.data(),
+      })) as any[];
+      callback(users);
+    });
   }
 
   async singIn(user: User) {
@@ -201,6 +214,8 @@ export class Servers implements OnDestroy {
       const userData = userDoc.data() as User;
 
       if (userData.approved) {
+        this.adminUser.set(false);
+        this.supportUser.set(false);
         const availableBio = await this.biometric.isAvailalbe();
         const bioIsRegister = localStorage.getItem('xionico_auth_cred_id');
 
@@ -211,8 +226,8 @@ export class Servers implements OnDestroy {
 
         if (userData.role === 0) {
           this.adminUser.set(true);
-        }else if(userData.role === 1){
-          this.supportUser.set(true)
+        } else if (userData.role === 1) {
+          this.supportUser.set(true);
         }
 
         return userData;
@@ -237,6 +252,8 @@ export class Servers implements OnDestroy {
   }
 
   async signOut() {
+    this.adminUser.set(false);
+    this.supportUser.set(false);
     return getAuth()
       .signOut()
       .then(() => {
@@ -264,22 +281,21 @@ export class Servers implements OnDestroy {
       sucursales: [],
     };
 
-    /* await this.emailSender(user, uid); */
+    await this.emailSender(user, uid);
 
     return setDoc(userDoc, userProfile);
   }
 
-  async deleteUser(userId:string){
+  async deleteUser(userId: string) {
     const functions = getFunctions();
     const deleteUserFn = httpsCallable(functions, 'deleteUserAuth');
 
     try {
-      await deleteUserFn({uid: userId});
+      await deleteUserFn({ uid: userId });
       console.log('Usuario eliminado');
     } catch (error) {
       console.log('Error al eliminar el usuario');
     }
-
   }
 
   async emailSender(user: User, userId: string) {

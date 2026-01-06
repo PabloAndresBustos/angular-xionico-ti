@@ -23,6 +23,7 @@ import {
   trashOutline,
 } from 'ionicons/icons';
 import { Servers } from 'src/app/shared/services/servers';
+import { CustomSelectComponent } from "../custom-select/custom-select.component";
 
 @Component({
   selector: 'app-sing-up-user',
@@ -33,7 +34,8 @@ import { Servers } from 'src/app/shared/services/servers';
     IonicElementsModule,
     ComponentsModule,
     ReactiveFormsModule,
-  ],
+    CustomSelectComponent
+],
 })
 export class SingUpUserComponent implements OnInit {
   user = input.required<User>();

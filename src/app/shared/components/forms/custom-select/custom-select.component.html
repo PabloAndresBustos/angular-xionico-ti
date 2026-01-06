@@ -1,0 +1,17 @@
+<div class="border-b border-gray-200">
+  <ion-item lines="none" class="--background: transparent;">
+    <ion-icon [name]="icon()" slot="start" color="xionico" class="opacity-60"></ion-icon>
+    <ion-select
+      [label]="label()"
+      label-placement="'floating'"
+      [multiple]="multiple()"
+      [formControl]="control()">
+
+      <ng-content></ng-content>
+
+      @for (opt of options(); track opt) {
+        <ion-select-option [value]="opt">{{ opt }}</ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+</div>
