@@ -23,7 +23,9 @@
     </div>
 
      <app-custom-select label="Rol del Usuario" icon="layers-outline" [control]="getControl('role')">
-      <ion-select-option [value]="0">Admin</ion-select-option>
+      @if(adminUser()) {
+        <ion-select-option [value]="0">Admin</ion-select-option>
+      }
       <ion-select-option [value]="1">Soporte</ion-select-option>
       <ion-select-option [value]="2">Usuario</ion-select-option>
     </app-custom-select>
@@ -51,7 +53,8 @@
       {{okButton()}}
     </ion-button>
 
-    <div class="relative flex py-2 items-center">
+    @if(adminUser()){
+      <div class="relative flex py-2 items-center">
       <div class="flex-grow border-t border-gray-200"></div>
       <span class="flex-shrink mx-2 text-gray-300 text-xs italic">o</span>
       <div class="flex-grow border-t border-gray-200"></div>
@@ -61,5 +64,6 @@
       <ion-icon slot="start" name="trash-outline"></ion-icon>
       {{redButton()}}
     </ion-button>
+    }
   </div>
 </div>

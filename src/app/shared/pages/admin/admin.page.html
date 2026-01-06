@@ -37,7 +37,7 @@
   <app-header />
 
   <ion-content [fullscreen]="true" class="ion-padding">
-    @if(adminUser()){
+    @if(adminUser() || supportUser()){
 
       @if(activeSection() === 'pending'){
         <app-users-sing-up [pendingUsers]="pendingUsers()" [allServerData]="allServerData()" />

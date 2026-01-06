@@ -117,6 +117,10 @@ export class SingUpUserComponent implements OnInit {
     }
   }
 
+  adminUser() {
+    return this.servers.adminUser();
+  }
+
   ngOnInit() {
     this.cardForm = new FormGroup({
       distribuidoraAsignada: new FormControl(''),

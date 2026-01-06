@@ -1,9 +1,10 @@
-import { Component, computed, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { IonicElementsModule } from 'src/app/shared/modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from 'src/app/shared/modules/components/components-module';
 import { User } from 'src/app/shared/models/user.model';
 import { SingUpUserComponent } from 'src/app/shared/components/forms/sing-up-user/sing-up-user.component';
 import { SectionComponent } from 'src/app/shared/components/section/section.component';
+import { Servers } from 'src/app/shared/services/servers';
 
 @Component({
   selector: 'app-active-users',
@@ -21,6 +22,7 @@ export class ActiveUsersPage implements OnInit {
   approvedUsers = input.required<User[]>();
   allServerData = input.required<User[]>();
   searchTerm = signal<string>('');
+  private servers = inject(Servers);
 
   filteredUsers = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
@@ -37,6 +39,10 @@ export class ActiveUsersPage implements OnInit {
 
   handleSearch(event: any) {
     this.searchTerm.set(event.detail.value);
+  }
+
+  adminUser() {
+    return this.servers.adminUser();
   }
 
   constructor() {}
