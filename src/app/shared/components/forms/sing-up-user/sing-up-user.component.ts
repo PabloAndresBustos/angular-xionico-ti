@@ -38,14 +38,12 @@ import { CustomSelectComponent } from '../custom-select/custom-select.component'
   ],
 })
 export class SingUpUserComponent implements OnInit {
-
   user = input.required<User>();
   allServers = input<any[]>([]);
   title = input.required<string>();
   okButton = input.required<string>();
   redButton = input.required<string>();
   selectedDist = signal<string>('');
-
 
   private servers = inject(Servers);
 
@@ -100,11 +98,20 @@ export class SingUpUserComponent implements OnInit {
     const path = `users/${this.user().uid}`;
 
     try {
-      await this.servers.deleteDocument(path);
-      await this.servers.deleteUser(this.user().uid);
+      const updateData = {
+        approved: false,
+      }
+      await this.servers.updateDocument(path, updateData);
       console.log('Solicitud eliminada correctamente');
     } catch (error) {
       console.error('Error al eliminar:', error);
+    }
+  }
+
+  private checkRolePermissions(role: number) {
+    if (role === 0 || role === 1) {
+      this.cardForm.get('distribuidoraAsignada')?.disable();
+      this.cardForm.get('sucursales')?.disable();
     }
   }
 
@@ -112,39 +119,28 @@ export class SingUpUserComponent implements OnInit {
     this.cardForm = new FormGroup({
       distribuidoraAsignada: new FormControl(''),
       sucursales: new FormControl({ value: [], disabled: true }),
-      role: new FormControl(2), // Valor inicial Usuario
-      approved: new FormControl(false),
+      role: new FormControl(2),
+      approved: new FormControl(true),
     });
 
-    this.cardForm.get('role')?.valueChanges.subscribe((role) => {
-      const distControl = this.cardForm.get('distribuidoraAsignada');
-      const sucControl = this.cardForm.get('sucursales');
-
-      if (role === 0 || role === 1) {
-        distControl?.setValue('Todas');
-        sucControl?.setValue('Todas');
-        distControl?.disable();
-        sucControl?.disable();
-      } else {
-        distControl?.enable();
-        distControl?.setValue('');
-        sucControl?.setValue([]);
-      }
-    });
-
-    this.cardForm
-      .get('distribuidoraAsignada')
-      ?.valueChanges.subscribe((val) => {
-        this.selectedDist.set(val);
-        const sucursalesControl = this.cardForm.get('sucursales');
-        const currentRole = this.cardForm.get('role')?.value;
-
-        if (val && currentRole === 2) {
-          sucursalesControl?.enable();
-        } else if (currentRole === 2) {
-          sucursalesControl?.disable();
-          sucursalesControl?.setValue([]);
-        }
+    const userData = this.user();
+    if (userData) {
+      this.cardForm.patchValue({
+        distribuidoraAsignada: userData.distribuidoraAsignada || '',
+        role: userData.role ?? 2,
+        approved: userData.approved ?? true,
       });
+
+      if (userData.distribuidoraAsignada) {
+        this.selectedDist.set(userData.distribuidoraAsignada);
+        const sucControl = this.cardForm.get('sucursales');
+
+        sucControl?.enable();
+        sucControl?.setValue(userData.sucursales || []);
+      }
+    }
+
+    this.checkRolePermissions(this.cardForm.get('role')?.value);
+
   }
 }
