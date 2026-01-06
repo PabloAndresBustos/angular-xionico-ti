@@ -23,7 +23,7 @@ import {
   trashOutline,
 } from 'ionicons/icons';
 import { Servers } from 'src/app/shared/services/servers';
-import { CustomSelectComponent } from "../custom-select/custom-select.component";
+import { CustomSelectComponent } from '../custom-select/custom-select.component';
 
 @Component({
   selector: 'app-sing-up-user',
@@ -34,8 +34,8 @@ import { CustomSelectComponent } from "../custom-select/custom-select.component"
     IonicElementsModule,
     ComponentsModule,
     ReactiveFormsModule,
-    CustomSelectComponent
-],
+    CustomSelectComponent,
+  ],
 })
 export class SingUpUserComponent implements OnInit {
   user = input.required<User>();
@@ -64,8 +64,7 @@ export class SingUpUserComponent implements OnInit {
 
   sucursalesFiltradas = computed(() => {
     const dist = this.selectedDist();
-    if (!dist) return [];
-
+    if (!dist || dist === 'Todas') return [];
     return this.allServers()
       .filter((s) => s.nombreDistribuidora === dist)
       .map((s) => s.nombreServidor || s.id);
@@ -81,7 +80,7 @@ export class SingUpUserComponent implements OnInit {
 
     try {
       const updateData = {
-        ...this.cardForm.value,
+        ...this.cardForm.getRawValue(),
         approved: true,
       };
 
@@ -96,7 +95,7 @@ export class SingUpUserComponent implements OnInit {
 
     try {
       await this.servers.deleteDocument(path);
-      await this.servers.deleteUser(this.user().uid)
+      await this.servers.deleteUser(this.user().uid);
       console.log('Solicitud eliminada correctamente');
     } catch (error) {
       console.error('Error al eliminar:', error);
@@ -107,8 +106,24 @@ export class SingUpUserComponent implements OnInit {
     this.cardForm = new FormGroup({
       distribuidoraAsignada: new FormControl(''),
       sucursales: new FormControl({ value: [], disabled: true }),
-      role: new FormControl(2),
+      role: new FormControl(2), // Valor inicial Usuario
       approved: new FormControl(false),
+    });
+
+    this.cardForm.get('role')?.valueChanges.subscribe((role) => {
+      const distControl = this.cardForm.get('distribuidoraAsignada');
+      const sucControl = this.cardForm.get('sucursales');
+
+      if (role === 0 || role === 1) {
+        distControl?.setValue('Todas');
+        sucControl?.setValue('Todas');
+        distControl?.disable();
+        sucControl?.disable();
+      } else {
+        distControl?.enable();
+        distControl?.setValue('');
+        sucControl?.setValue([]);
+      }
     });
 
     this.cardForm
@@ -116,10 +131,11 @@ export class SingUpUserComponent implements OnInit {
       ?.valueChanges.subscribe((val) => {
         this.selectedDist.set(val);
         const sucursalesControl = this.cardForm.get('sucursales');
+        const currentRole = this.cardForm.get('role')?.value;
 
-        if (val) {
+        if (val && currentRole === 2) {
           sucursalesControl?.enable();
-        } else {
+        } else if (currentRole === 2) {
           sucursalesControl?.disable();
           sucursalesControl?.setValue([]);
         }
