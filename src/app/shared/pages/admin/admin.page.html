@@ -2,8 +2,7 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
   @if(adminUser()){
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
-
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-max">
     @for (user of pendingUsers(); track user.uid) {
     <app-sing-up-user [user]="user" [allServers]="allServerData()" />
     } @empty {
@@ -13,9 +12,47 @@
     </div>
     }
   </div>
+  <div class="flex items-center my-2">
+    <div class="flex-grow h-px bg-gray-100"></div>
+    <span class="px-3 text-gray-400 text-xs uppercase">Usuarios Activos</span>
+    <div class="flex-grow h-px bg-gray-100"></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+    @for (user of approvedUsers(); track user.uid) {
+    <div
+      class="bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-full transition-transform hover:scale-[1.02]">
 
-  <div>
-    <h1>Bajas de usuarios</h1>
+      <div class="flex items-center justify-between bg-gradient-to-br from-blue-500 to-blue-700 p-6 flex-grow">
+
+        <div class="flex items-center gap-4">
+          <ion-icon name="person-outline" class="text-white text-4xl opacity-90"></ion-icon>
+          <div class="flex flex-col">
+            <h2 class="text-white text-xl font-bold tracking-tight">{{user.name}}</h2>
+            <p class="text-blue-100 text-sm mt-1">
+              <span class="font-semibold">Distribuidora:</span>
+              {{user.distribuidoraAsignada?.length === 0 || !user.distribuidoraAsignada ? 'Todas' :
+              user.distribuidoraAsignada}}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-end gap-2">
+          <span
+            class="bg-[#FFC409] text-black text-[9px] font-extrabold px-3 py-1 rounded-lg shadow-sm uppercase tracking-tighter">
+            {{ user.role === 0 ? 'Administrador' : (user.role === 1 ? 'Soporte' : 'Usuario') }}
+          </span>
+          <span class="bg-[#FFC409] text-black text-[9px] font-medium px-2 py-0.5 rounded-lg opacity-90 font-mono">
+            {{ user.uid.substring(0, 15) }}...
+          </span>
+        </div>
+      </div>
+      <button
+        class="w-full bg-[#CC0000] hover:bg-red-700 text-white font-extrabold py-5 flex items-center justify-center gap-3 uppercase tracking-[0.2em] text-sm transition-all active:scale-95">
+        <ion-icon name="trash-outline" class="text-xl"></ion-icon>
+        Eliminar Usuario
+      </button>
+    </div>
+    }
   </div>
   }
 </ion-content>

@@ -4,6 +4,7 @@ import { ComponentsModule } from '../../modules/components/components-module';
 import { Servers } from '../../services/servers';
 import { SingUpUserComponent } from "../../components/forms/sing-up-user/sing-up-user.component";
 import { ViewServices } from '../../services/view-services';
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-admin',
@@ -16,11 +17,8 @@ export class AdminPage implements OnInit, OnDestroy {
 
   servers = inject(Servers);
   private viewSrv = inject(ViewServices);
-  private rawUsers = signal<any[]>([]);
+  public rawUsers = signal<User[]>([]);
   private unsubscribeUsers?: () => void;
-
-  users = computed(() => this.rawUsers());
-  totalUsers = computed(() => this.users().length);
 
   constructor() {}
 
@@ -49,17 +47,13 @@ export class AdminPage implements OnInit, OnDestroy {
     return this.servers.adminUser();
   }
 
+  approvedUsers(){
+    return this.servers.approvedUsers();
+  }
+
   ngOnInit() {
-    console.log('admin:', this.adminUser())
-    console.log('support:', this.servers.supportUser())
     this.viewSrv.isAdminPanel.set(true)
-
-    this.unsubscribeUsers = this.servers.getUsersRealTime((data) => {
-      this.rawUsers.set(data);
-      console.log(data)
-    });
-
-
+    console.log(this.servers.approvedUsers())
   }
 
   ngOnDestroy(): void {

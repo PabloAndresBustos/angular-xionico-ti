@@ -24,7 +24,6 @@ import {
   DocumentData,
   collectionGroup,
   deleteDoc,
-  getDocs,
 } from 'firebase/firestore';
 import {
   Auth,
@@ -52,6 +51,7 @@ export class Servers implements OnDestroy {
   supportUser = signal<boolean>(false);
   distribuidoras = signal<any[]>([]);
   allUsers = signal<User[]>([]);
+  aprovedUsers = signal<User[]>([]);
 
   constructor() {
     this.listenToAuthChanges();
@@ -188,17 +188,13 @@ export class Servers implements OnDestroy {
     return await getDoc(doc(getFirestore(), 'users', userId));
   }
 
-  getUsersRealTime(callback: (users: any[]) => void) {
-    const q = query(collection(getFirestore(), 'users'));
+  approvedUsers = computed(() => {
+    const users = this.allUsers();
 
-    return onSnapshot(q, (snapshot) => {
-      const users = snapshot.docs.map((doc) => ({
-        uid: doc.id,
-        ...doc.data(),
-      })) as any[];
-      callback(users);
-    });
-  }
+    if (!users || users.length === 0) return [];
+
+    return users.filter((user) => user.approved === true);
+  });
 
   async singIn(user: User) {
     const credential = await signInWithEmailAndPassword(
