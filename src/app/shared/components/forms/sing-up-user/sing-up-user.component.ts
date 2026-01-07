@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  effect,
   inject,
   input,
   OnInit,
@@ -60,6 +61,12 @@ export class SingUpUserComponent implements OnInit {
       mapOutline,
       trashOutline,
     });
+
+    effect(() => {
+      const value = this.getControl('distribuidoraAsignada').value;
+      this.selectedDist.set(value);
+      console.log('Distribuidora seleccionada:', value);
+    });
   }
 
   getControl(name: string): FormControl {
@@ -79,6 +86,11 @@ export class SingUpUserComponent implements OnInit {
     return [...new Set(servidores.map((s) => s.nombreDistribuidora))];
   });
 
+  distSelect(dist: string) {
+    this.selectedDist.set(dist);
+    this.getControl('sucursales').setValue([]);
+  }
+
   async onConfirm() {
     const path = `users/${this.user().uid}`;
 
@@ -86,7 +98,7 @@ export class SingUpUserComponent implements OnInit {
       const updateData = {
         ...this.cardForm.getRawValue(),
         approved: true,
-        active: true
+        active: true,
       };
 
       await this.servers.updateDocument(path, updateData);
@@ -102,7 +114,7 @@ export class SingUpUserComponent implements OnInit {
       const updateData = {
         approved: false,
         active: false,
-      }
+      };
       await this.servers.updateDocument(path, updateData);
       console.log('Solicitud eliminada correctamente');
     } catch (error) {
@@ -127,7 +139,7 @@ export class SingUpUserComponent implements OnInit {
       sucursales: new FormControl({ value: [], disabled: true }),
       role: new FormControl(2),
       approved: new FormControl(true),
-      deleted: new FormControl(this.user().active || false)
+      deleted: new FormControl(this.user().active || false),
     });
 
     const userData = this.user();
@@ -148,6 +160,5 @@ export class SingUpUserComponent implements OnInit {
     }
 
     this.checkRolePermissions(this.cardForm.get('role')?.value);
-
   }
 }

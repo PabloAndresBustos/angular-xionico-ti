@@ -3,6 +3,7 @@ import {
   computed,
   effect,
   inject,
+  input,
   OnInit,
   signal,
 } from '@angular/core';
@@ -12,6 +13,7 @@ import { IonicElementsModule } from 'src/app/shared/modules/ionic-elements/ionic
 import { ComponentsModule } from 'src/app/shared/modules/components/components-module';
 import { SectionComponent } from 'src/app/shared/components/section/section.component';
 import { Servers } from 'src/app/shared/services/servers';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-sql-query',
@@ -33,6 +35,10 @@ export class SqlQueryPage implements OnInit {
   isReady = signal(false);
   isExecuting = signal(false);
   queryData = signal<any[]>([]);
+  allServerData = input.required<any[]>();
+  fijarColumnas = signal<string[]>([]);
+  lastProcessedRequest = signal<string>('');
+  manualDbName: string = '';
 
   selectedIp = '';
   selectedDbName = '';
@@ -41,48 +47,44 @@ export class SqlQueryPage implements OnInit {
   public servers = inject(Servers);
 
   constructor() {
-    effect(
-      () => {
-        const server = this.selectedServer();
-        const current = this.servers
-          .allServersData()
-          .find((s) => s.id === server?.id);
-        const command = current?.lastCommand;
+    effect(() => {
+      const server = this.selectedServer();
+      const current = this.allServerData().find((s) => s.id === server?.id);
+      const command = current?.lastCommand;
 
-        if (!command) return;
+      if (!command) return;
 
-        if (command.status === 'PENDING') {
-          this.isExecuting.set(true);
-          this.queryData.set([]);
+      if (command.status === 'PENDING') {
+        this.isExecuting.set(true);
+        return;
+      }
+
+      if (command.status === 'SUCCESS' || command.status === 'FINISHED') {
+        if (command.requestedAt === this.lastProcessedRequest()) {
+          this.isExecuting.set(false);
           return;
         }
 
-        if (command.status === 'SUCCESS' || command.status === 'FINISHED') {
-          this.isExecuting.set(false);
+        const newData = command.results || [];
 
-          const currentData = JSON.stringify(this.queryData());
-          const newData = JSON.stringify(command.results || []);
-
-          if (currentData !== newData) {
-            this.queryData.set(command.results || []);
-          }
+        if (newData.length > 0) {
+          this.fijarColumnas.set(Object.keys(newData[0]));
         }
+        this.queryData.set(newData);
 
-        if (command.status === 'ERROR') {
-          this.isExecuting.set(false);
-        }
-      },
-      { allowSignalWrites: true }
-    );
-  }
+        this.lastProcessedRequest.set(command.requestedAt);
+        this.isExecuting.set(false);
+      }
 
-  ngOnInit() {
-    setTimeout(() => this.isReady.set(true), 300);
+      if (command.status === 'ERROR') {
+        this.isExecuting.set(false);
+      }
+    });
   }
 
   serversInDist = computed(() => {
     const dist = this.selectedDist();
-    const allServers = this.servers.allServersData();
+    const allServers = this.allServerData();
     if (!dist) return [];
     return allServers.filter((s) => s.nombreDistribuidora === dist);
   });
@@ -91,6 +93,15 @@ export class SqlQueryPage implements OnInit {
     const server = this.selectedServer();
     return server?.availableIps || [];
   });
+
+  columnas = computed(() => {
+    const data = this.queryData();
+    return data.length > 0 ? Object.keys(data[0]) : [];
+  });
+
+  compareWith = (o1: any, o2: any) => {
+    return o1 && o2 ? o1.id === o2.id : o1 === o2;
+  };
 
   onDistChange(ev: any) {
     this.selectedDist.set(ev.detail.value);
@@ -110,10 +121,13 @@ export class SqlQueryPage implements OnInit {
   }
 
   canExecute() {
+    const dbFinal =
+      this.selectedDbName === 'OTRA' ? this.manualDbName : this.selectedDbName;
+
     const common =
       this.selectedDist() &&
       this.selectedServer() &&
-      this.selectedDbName &&
+      dbFinal &&
       this.queryText.trim().length > 10;
 
     if (this.selectedDist() === 'AMERICA') {
@@ -154,7 +168,17 @@ export class SqlQueryPage implements OnInit {
 
   async ejecutarConsulta() {
     const server = this.selectedServer();
-    if (!server || this.isExecuting()) return;
+    if (!server?.id || this.isExecuting()) return;
+
+    const dbFinal =
+      this.selectedDbName === 'OTRA'
+        ? this.manualDbName.trim()
+        : this.selectedDbName;
+
+    if (!dbFinal) {
+      console.error('Debes especificar un nombre de base de datos');
+      return;
+    }
 
     this.isExecuting.set(true);
 
@@ -164,7 +188,7 @@ export class SqlQueryPage implements OnInit {
     try {
       await this.sendSqlCommand(this.selectedDist(), server.id, {
         ip: ipFinal,
-        dbName: this.selectedDbName,
+        dbName: dbFinal,
         query: this.queryText,
       });
     } catch (error) {
@@ -187,4 +211,47 @@ export class SqlQueryPage implements OnInit {
       .find((s) => s.id === server?.id);
     return currentServer?.lastCommand;
   });
+
+  isTimestamp(value: any): boolean {
+    return value && typeof value === 'object' && 'seconds' in value;
+  }
+
+  convertToDate(value: any): Date {
+    return new Date(value.seconds * 1000);
+  }
+
+  exportarAExcel() {
+    const data = this.queryData();
+    const columnas = this.fijarColumnas();
+
+    if (data.length === 0) return;
+
+    const dataParaExcel = data.map((row) => {
+      const objetoOrdenado: any = {};
+      columnas.forEach((col) => {
+        let valor = row[col];
+        if (this.isTimestamp(valor)) {
+          const d = this.convertToDate(valor);
+          valor = d.toLocaleString();
+        }
+        objetoOrdenado[col] = valor ?? '-';
+      });
+      return objetoOrdenado;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataParaExcel);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Resultados_SQL');
+
+    const fecha = new Date().toISOString().slice(0, 10);
+    const nombreArchivo = `Consulta_${
+      this.selectedServer()?.nombreServidor
+    }_${fecha}.xlsx`;
+
+    XLSX.writeFile(workbook, nombreArchivo);
+  }
+
+  ngOnInit() {
+    setTimeout(() => this.isReady.set(true), 300);
+  }
 }

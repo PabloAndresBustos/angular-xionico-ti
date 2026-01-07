@@ -1,24 +1,25 @@
-<app-section [title]="'CONSULTAS SQL'" [iconName]="'server-outline'" [data]="false" [subTitle]="''"
-  [status]="false"></app-section>
+<app-section [title]="'CONSULTAS SQL'" [iconName]="'server-outline'" [data]="false" [subTitle]="''" [status]="false">
+</app-section>
 
 @if (isReady()) {
-<div class="p-4 mx-auto w-full h-[40%]">
-  <ion-card class="m-0 shadow-lg">
+<div class="p-4 mx-auto w-full">
+  <ion-card class="m-0 shadow-lg border border-gray-100">
     <ion-card-content class="space-y-4">
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <ion-item lines="outline">
-          <ion-label position="stacked">Distribuidora</ion-label>
-          <ion-select (ionChange)="onDistChange($event)" placeholder="Seleccione">
+        <ion-item lines="outline" class="rounded-lg">
+          <ion-label position="stacked" class="font-bold text-gray-600">Distribuidora</ion-label>
+          <ion-select (ionChange)="onDistChange($event)" placeholder="Seleccione distribuidora">
             @for (dist of (servers.distribuidorasDeServidores() || []); track dist.id) {
             <ion-select-option [value]="dist.id">{{ dist.nombre }}</ion-select-option>
             }
           </ion-select>
         </ion-item>
 
-        <ion-item lines="outline" [disabled]="!selectedDist()">
-          <ion-label position="stacked">Sucursal</ion-label>
-          <ion-select (ionChange)="onServerChange($event)" placeholder="Seleccione">
+        <ion-item lines="outline" class="rounded-lg" [disabled]="!selectedDist()">
+          <ion-label position="stacked" class="font-bold text-gray-600">Sucursal (Servidor)</ion-label>
+          <ion-select (ionChange)="onServerChange($event)" [compareWith]="compareWith" [value]="selectedServer()"
+            placeholder="Seleccione sucursal">
             @for (server of (serversInDist() || []); track server.id) {
             <ion-select-option [value]="server">{{ server.nombreServidor }}</ion-select-option>
             }
@@ -27,33 +28,49 @@
 
         <ion-item lines="outline" class="rounded-lg" [disabled]="selectedDist() !== 'AMERICA' || !selectedServer()">
           <ion-label position="stacked" class="font-bold text-primary">Sucursal Destino (IP)</ion-label>
-          <ion-select placeholder="Seleccione..." [(ngModel)]="selectedIp">
+          <ion-select placeholder="Seleccione IP..." [(ngModel)]="selectedIp">
             @for (item of availableIps(); track item.ip) {
             <ion-select-option [value]="item.ip">
-              {{ item.nombre }} ({{ item.ip }})
+              {{ item.nombre }}: {{ item.ip }}
             </ion-select-option>
             }
           </ion-select>
         </ion-item>
 
-        <ion-item lines="outline" [disabled]="!selectedServer()">
-          <ion-label position="stacked">Base de Datos</ion-label>
-          <ion-select [(ngModel)]="selectedDbName" placeholder="Base">
-            <ion-select-option value="ArcorGEV5">ArcorGEV5</ion-select-option>
-            <ion-select-option value="ArcorGEV5Reparto">ArcorGEV5Reparto</ion-select-option>
-            <ion-select-option value="ArcorPDA">ArcorPDA</ion-select-option>
-          </ion-select>
-        </ion-item>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+          <ion-item lines="outline" class="rounded-lg" [disabled]="!selectedServer()">
+            <ion-label position="stacked" class="font-bold text-gray-600">Base de Datos</ion-label>
+
+            @if (selectedDbName !== 'OTRA') {
+            <ion-select [(ngModel)]="selectedDbName" placeholder="Seleccione DB">
+              <ion-select-option value="ArcorGEV5">ArcorGEV5</ion-select-option>
+              <ion-select-option value="ArcorGEV5Reparto">ArcorGEV5Reparto</ion-select-option>
+              <ion-select-option value="Arcor_PDA">Arcor_PDA</ion-select-option>
+              <ion-select-option value="OTRA">-- OTRA (Manual) --</ion-select-option>
+            </ion-select>
+            } @else {
+            <div class="flex items-center w-full">
+              <ion-input [(ngModel)]="manualDbName" placeholder="Nombre de la DB...">
+              </ion-input>
+              <ion-button fill="clear" size="small" (click)="selectedDbName = ''">
+                <ion-icon name="close-circle" slot="icon-only" color="medium"></ion-icon>
+              </ion-button>
+            </div>
+            }
+          </ion-item>
+        </div>
       </div>
 
       <div class="mt-4">
-        <textarea [(ngModel)]="queryText" placeholder="Escriba su consulta SQL aquí..."
-          class="w-full h-80 p-6 font-mono text-base bg-gray-900 rounded-lg outline-none border-2 border-gray-700 focus:border-blue-500 transition-all custom-textarea">
+        <label class="block mb-2 text-sm font-bold text-gray-700 uppercase tracking-wide">Sentencia SQL</label>
+        <textarea [(ngModel)]="queryText" placeholder="SELECT * FROM tabla WHERE..."
+          class="w-full h-64 p-6 font-mono text-base bg-gray-900 text-green-400 rounded-lg outline-none border-2 border-gray-700 focus:border-blue-500 transition-all custom-textarea uppercase shadow-inner">
         </textarea>
       </div>
 
-      <div class="flex justify-end">
-        <ion-button (click)="ejecutarConsulta()" [disabled]="!canExecute() || isExecuting()">
+      <div class="flex justify-end pt-2">
+        <ion-button (click)="ejecutarConsulta()" [disabled]="!canExecute() || isExecuting()" color="xionico"
+          class="font-bold shadow-md">
           <ion-icon [name]="isExecuting() ? 'hourglass-outline' : 'play-outline'" slot="start"></ion-icon>
           {{ isExecuting() ? 'PROCESANDO...' : 'EJECUTAR CONSULTA' }}
         </ion-button>
@@ -61,54 +78,92 @@
     </ion-card-content>
   </ion-card>
 
-  @if (queryResults().length > 0) {
-  <div class="mt-6 overflow-x-auto border border-gray-200 rounded-lg shadow-xl bg-white">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-800">
-        @for (row of queryData(); track $index) {
-        <tr class="hover:bg-gray-50">
-          @for (key of Object.keys(row); track key) {
-          <td class="px-4 py-2 text-sm text-gray-600">
-            {{ row[key] }}
-          </td>
-          }
-        </tr>
-        }
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-        @for (row of queryResults(); track $index) {
-        <tr class="hover:bg-blue-50 transition-colors">
-          @for (key of Object.keys(row); track key) {
-          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-r border-gray-100 last:border-0">
-            {{ row[key] }}
-          </td>
-          }
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-  } @else if (lastCommand()?.status === 'PENDING') {
-  <div
-    class="flex flex-col items-center justify-center p-12 text-blue-600 bg-blue-50 rounded-xl mt-6 border border-blue-100">
-    <ion-spinner name="dots" color="primary"></ion-spinner>
-    <span class="mt-4 font-semibold italic text-lg">Consultando servidor remoto...</span>
-  </div>
-  } @else if (lastCommand()?.status === 'ERROR') {
-  <div class="p-6 mt-6 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-sm">
-    <div class="flex items-center mb-2">
-      <ion-icon name="warning" class="text-2xl mr-2"></ion-icon>
-      <strong class="text-lg">Error en la base de datos</strong>
+  @if (queryData().length > 0 && (lastCommand()?.status === 'SUCCESS' || lastCommand()?.status === 'FINISHED')) {
+  <div class="flex justify-between items-center mb-4 mt-6 px-2">
+    <div class="text-sm text-gray-500 italic">
+      Se encontraron <strong>{{ queryData().length }}</strong> registros.
     </div>
-    <pre
-      class="bg-white p-4 rounded border border-red-100 overflow-x-auto text-sm font-mono">{{ lastCommand()?.error }}</pre>
+    <ion-button color="success" size="small" (click)='exportarAExcel()'>
+      <ion-icon name="download-outline" slot="start"></ion-icon>
+      EXPORTAR EXCEL
+    </ion-button>
   </div>
   }
+
+  <div class="mt-6">
+
+    @if (lastCommand()?.status === 'SUCCESS' || lastCommand()?.status === 'FINISHED') {
+
+    @if (queryData().length > 0) {
+    <div
+      class="overflow-x-auto border border-gray-200 rounded-xl shadow-2xl bg-white animate__animated animate__fadeIn">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-800">
+          <tr>
+            @for (col of fijarColumnas(); track col) {
+            <th
+              class="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider border-r border-gray-700 last:border-0">
+              {{ col }}
+            </th>
+            }
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-100">
+          @for (row of queryData(); track $index) {
+          <tr class="hover:bg-blue-50 transition-colors">
+            @for (col of fijarColumnas(); track col) {
+            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-r border-gray-50 last:border-0">
+
+              @if (isTimestamp(row[col])) {
+              <span class="font-medium text-blue-700">
+                {{ convertToDate(row[col]) | date:'dd/MM/yyyy HH:mm:ss' }}
+              </span>
+              } @else {
+              {{ row[col] !== null ? row[col] : '-' }}
+              }
+
+            </td>
+            }
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    } @else {
+    <div
+      class="p-8 bg-amber-50 text-amber-700 rounded-xl border border-amber-200 text-center italic flex flex-col items-center">
+      <ion-icon name="information-circle-outline" class="text-3xl mb-2"></ion-icon>
+      La consulta se completó correctamente, pero la tabla no contiene registros.
+    </div>
+    }
+
+    } @else if (lastCommand()?.status === 'PENDING') {
+    <div
+      class="flex flex-col items-center justify-center p-16 text-blue-600 bg-blue-50 rounded-xl border border-blue-100 shadow-inner">
+      <ion-spinner name="crescent" color="primary" class="scale-150"></ion-spinner>
+      <span class="mt-6 font-bold italic text-lg animate-pulse">Consultando servidor remoto...</span>
+    </div>
+
+    } @else if (lastCommand()?.status === 'ERROR') {
+    <div
+      class="p-6 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-lg animate__animated animate__shakeX">
+      <div class="flex items-center mb-3">
+        <ion-icon name="alert-circle" class="text-3xl mr-2"></ion-icon>
+        <strong class="text-xl">Error de Motor SQL</strong>
+      </div>
+      <pre
+        class="bg-gray-900 text-red-400 p-5 rounded-lg overflow-x-auto text-sm font-mono shadow-inner border border-red-300">
+          {{ lastCommand()?.error }}
+        </pre>
+    </div>
+    }
+
+  </div>
 </div>
 
 } @else {
-<div class="flex flex-col justify-center items-center h-64">
-  <ion-spinner name="crescent" color="primary"></ion-spinner>
-  <p class="mt-4 text-gray-500 animate-pulse font-medium">Cargando módulos de consulta...</p>
+<div class="flex flex-col justify-center items-center h-screen bg-gray-50">
+  <ion-spinner name="dots" color="primary" class="scale-150"></ion-spinner>
+  <p class="mt-4 text-gray-500 font-bold uppercase tracking-widest text-xs">Preparando entorno de datos</p>
 </div>
 }

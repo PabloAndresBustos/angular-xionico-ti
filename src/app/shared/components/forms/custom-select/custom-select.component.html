@@ -5,7 +5,9 @@
       [label]="label()"
       label-placement="'floating'"
       [multiple]="multiple()"
-      [formControl]="control()">
+      [formControl]="control()"
+      (ionChange)="optionsChange($event)"
+      >
 
       <ng-content></ng-content>
 

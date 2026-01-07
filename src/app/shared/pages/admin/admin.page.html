@@ -46,7 +46,7 @@
       }@else if(activeSection() === 'distribuidoras') {
         <app-distribuidoras />
       }@else{
-        <app-sql-query />
+        <app-sql-query [allServerData]="allServerData()"/>
       }
 
     } @else {

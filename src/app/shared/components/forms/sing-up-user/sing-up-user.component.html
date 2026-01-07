@@ -41,7 +41,7 @@
     </div>
 
     <app-custom-select label="Distribuidora Asignada" icon="business-outline"
-      [control]="getControl('distribuidoraAsignada')" [options]="uniqueDistributors()">
+      [control]="getControl('distribuidoraAsignada')" [options]="uniqueDistributors()" (selectionChange)="distSelect($event)">
     </app-custom-select>
 
     <app-custom-select label="Sucursales" icon="map-outline" [multiple]="true" [control]="getControl('sucursales')"

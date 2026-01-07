@@ -23,7 +23,11 @@ import {
   lockClosedOutline,
   serverOutline,
   hourglassOutline,
-  playOutline
+  playOutline,
+  downloadOutline,
+  closeCircle,
+  copyOutline,
+  shieldCheckmarkOutline
 } from 'ionicons/icons';
 
 
@@ -57,7 +61,11 @@ export class AdminPage implements OnInit, OnDestroy {
       lockClosedOutline,
       serverOutline,
       hourglassOutline,
-      playOutline
+      playOutline,
+      downloadOutline,
+      closeCircle,
+      copyOutline,
+      shieldCheckmarkOutline
     });
   }
 
