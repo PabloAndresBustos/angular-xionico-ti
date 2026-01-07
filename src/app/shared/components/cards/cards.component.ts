@@ -30,7 +30,9 @@ import {
   hardwareChipOutline,
   warningOutline,
   cloudOfflineOutline,
+  informationCircleOutline,
 } from 'ionicons/icons';
+
 
 @Component({
   selector: 'app-cards',
@@ -73,6 +75,7 @@ export class CardsComponent implements OnInit {
       hardwareChipOutline,
       warningOutline,
       cloudOfflineOutline,
+      informationCircleOutline,
     });
   }
 

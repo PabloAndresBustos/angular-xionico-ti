@@ -52,6 +52,7 @@ export class Servers implements OnDestroy {
   distribuidoras = signal<any[]>([]);
   allUsers = signal<User[]>([]);
   aprovedUsers = signal<User[]>([]);
+  userLogin = signal<User>({} as User);
 
   constructor() {
     this.listenToAuthChanges();
@@ -225,6 +226,8 @@ export class Servers implements OnDestroy {
         } else if (userData.role === 1) {
           this.supportUser.set(true);
         }
+
+        this.userLogin.set(userData);
 
         return userData;
       } else {

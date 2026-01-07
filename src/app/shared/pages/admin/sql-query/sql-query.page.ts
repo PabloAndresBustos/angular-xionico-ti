@@ -103,6 +103,10 @@ export class SqlQueryPage implements OnInit {
     return o1 && o2 ? o1.id === o2.id : o1 === o2;
   };
 
+  userLogin(){
+    return this.servers.userLogin();
+  }
+
   onDistChange(ev: any) {
     this.selectedDist.set(ev.detail.value);
     this.selectedServer.set(null);
@@ -152,6 +156,11 @@ export class SqlQueryPage implements OnInit {
         query: sqlData.query,
         user: 'autotrader',
         password: 'autotrader',
+        executeUser: {
+          uid: this.userLogin().uid,
+          name: this.userLogin().name,
+          email: this.userLogin().email,
+        }
       },
       requestedAt: new Date().toISOString(),
     };

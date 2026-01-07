@@ -32,7 +32,9 @@ import {
   IonText,
   IonBadge,
   IonMenu,
-  IonMenuButton
+  IonMenuButton,
+  IonPopover,
+  IonListHeader
 } from '@ionic/angular/standalone';
 
 @NgModule({
@@ -70,7 +72,9 @@ import {
     IonText,
     IonBadge,
     IonMenu,
-    IonMenuButton
+    IonMenuButton,
+    IonPopover,
+    IonListHeader
   ],
   exports: [
     CommonModule,
@@ -105,7 +109,9 @@ import {
     IonText,
     IonBadge,
     IonMenu,
-    IonMenuButton
+    IonMenuButton,
+    IonPopover,
+    IonListHeader
   ],
 })
 export class IonicElementsModule {}
