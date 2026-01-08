@@ -33,7 +33,8 @@ import {
   sparklesOutline,
   sparkles,
   cloudDownloadOutline,
-  documentText
+  documentText,
+  clipboardOutline
 } from 'ionicons/icons';
 
 
@@ -77,7 +78,8 @@ export class AdminPage implements OnInit, OnDestroy {
       sparklesOutline,
       sparkles,
       cloudDownloadOutline,
-      documentText
+      documentText,
+      clipboardOutline
     });
   }
 

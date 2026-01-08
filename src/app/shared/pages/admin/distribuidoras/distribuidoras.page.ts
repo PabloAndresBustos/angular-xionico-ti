@@ -77,5 +77,16 @@ export class DistribuidorasPage implements OnInit {
     }
   }
 
+  async copiarAlPortapapeles() {
+
+  if (!this.reporteGenerado) return;
+
+  try {
+    await navigator.clipboard.writeText(this.reporteGenerado);
+  } catch (err) {
+    console.log('Error', err)
+  }
+}
+
   ngOnInit() {}
 }
