@@ -26,6 +26,7 @@ import {
   mailOutline,
 } from 'ionicons/icons';
 
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -130,6 +131,10 @@ export class LoginPage implements OnInit {
 
   register() {
     this.router.navigateByUrl('/register');
+  }
+
+  recovery(){
+    this.router.navigateByUrl('/recovery');
   }
 
   ionViewWillLeave() {

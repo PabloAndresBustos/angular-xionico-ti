@@ -1,0 +1,53 @@
+<app-header />
+<ngx-spinner [fullScreen]="true" [type]="'square-jelly-box'">
+  <p style="color: white" > Cargando... </p>
+</ngx-spinner>
+<ion-content [fullscreen]="true">
+  <div class="flex flex-col justify-center items-center mt-8">
+
+    <div class="text-center mb-8">
+      <div class="bg-blue-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+        <ion-icon name="reload-outline" color="xionico" class="text-5xl"></ion-icon>
+      </div>
+      <h1 class="text-3xl font-extrabold tracking-tight" style="color:var(--ion-xionico-color);">RECUPERAR CUENTA</h1>
+      <p class="text-gray-500 text-sm mt-2">Bienvenido, recupera tu cuenta</p>
+    </div>
+
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-6 border border-gray-100">
+      <form [formGroup]="recoveryForm" class="space-y-4">
+
+        <div class="space-y-1">
+          <app-custom-input [isPassword]="false" [inputLabel]="'E-mail'" [inputType]="'email'"
+            [iconName]="'mail-outline'" [formControlValue]="recoveryForm.controls.email" />
+
+          @if(recoveryForm.controls.email.errors && recoveryForm.controls.email.touched){
+          <app-validator-form [message]="'Correo requerido'" [showMessage]="recoveryForm.controls.email.errors['required']"
+            [slot]="'start'" />
+          <app-validator-form [message]="'Formato de correo no válido'"
+            [showMessage]="recoveryForm.controls.email.errors['email']" [slot]="'start'" />
+          }
+        </div>
+
+        <div class="pt-4 flex flex-col gap-3">
+          <ion-button type="submit" expand="block" color="xionico" mode="md" [disabled]="recoveryForm.invalid"
+            class="h-12 font-bold shadow-md" (click)="enviarEnlace()">
+            <ion-icon slot="start" name="send-outline" class="mr-2"></ion-icon>
+            Solicitar recuperacion
+          </ion-button>
+
+          <div class="flex items-center my-2">
+            <div class="flex-grow h-px bg-gray-100"></div>
+            <span class="px-3 text-gray-400 text-xs uppercase">o</span>
+            <div class="flex-grow h-px bg-gray-100"></div>
+          </div>
+
+          <ion-button (click)="goToLogin()" expand="block" fill="clear" color="medium" class="mt-2 text-sm">
+            Volver al login
+          </ion-button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</ion-content>
+

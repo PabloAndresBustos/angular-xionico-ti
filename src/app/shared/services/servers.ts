@@ -30,6 +30,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { CryptoStorage } from './crypto-storage';
@@ -38,8 +39,8 @@ const getFirebaseConfig = () => {
   const crypto = inject(CryptoStorage);
   const encryptedKey = environment.firebaseKey;
   const decryptedKey = crypto.decryptData(encryptedKey);
-  return decryptedKey
-}
+  return decryptedKey;
+};
 
 @Injectable({
   providedIn: 'root',
@@ -62,7 +63,6 @@ export class Servers implements OnDestroy {
   allUsers = signal<User[]>([]);
   aprovedUsers = signal<User[]>([]);
   userLogin = signal<User>({} as User);
-
 
   constructor() {
     this.listenToAuthChanges();
@@ -204,7 +204,9 @@ export class Servers implements OnDestroy {
 
     if (!users || users.length === 0) return [];
 
-    return users.filter((user) => user.approved === true && user.active === true);
+    return users.filter(
+      (user) => user.approved === true && user.active === true
+    );
   });
 
   async singIn(user: User) {
@@ -220,12 +222,12 @@ export class Servers implements OnDestroy {
     if (userDoc.exists()) {
       const userData = userDoc.data() as User;
 
-      if(!userData.active){
+      if (!userData.active) {
         this.router.navigateByUrl('/reject-user');
         return null;
       }
 
-      if(!userData.approved && userData.active){
+      if (!userData.approved && userData.active) {
         this.router.navigateByUrl('/aprobation');
         return null;
       }
@@ -316,6 +318,12 @@ export class Servers implements OnDestroy {
     }
   }
 
+  async resetPassword(email: string) {
+    const auth = getAuth();
+    auth.languageCode = 'es';
+    return sendPasswordResetEmail(auth, email);
+  }
+
   async emailSender(user: User, userId: string) {
     const SERVICE_ID = environment.emailSender.serviceId;
     const TEMPLATE_ID = environment.emailSender.templateId;
@@ -364,7 +372,9 @@ export class Servers implements OnDestroy {
 
     if (!users) return [];
 
-    return users.filter((user) => user.approved === false && user.active === true);
+    return users.filter(
+      (user) => user.approved === false && user.active === true
+    );
   });
 
   distribuidorasDeServidores = computed(() => {
@@ -383,5 +393,4 @@ export class Servers implements OnDestroy {
       this.unsubscribeList();
     }
   }
-
 }

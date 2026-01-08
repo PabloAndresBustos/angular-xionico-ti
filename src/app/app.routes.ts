@@ -3,12 +3,6 @@ import { authGuard } from './shared/services/auth-guard';
 
 export const routes: Routes = [
   {
-    path: 'content',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./shared/pages/content/content.page').then((m) => m.ContentPage),
-  },
-  {
     path: 'login',
     loadComponent: () =>
       import('./shared/pages/login/login.page').then((m) => m.LoginPage),
@@ -25,6 +19,20 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./shared/pages/aprobation/aprobation.page').then(
         (m) => m.AprobationPage
+      ),
+  },
+  {
+    path: 'reject-user',
+    loadComponent: () =>
+      import('./shared/pages/reject-user/reject-user.page').then(
+        (m) => m.RejectUserPage
+      ),
+  },
+  {
+    path: 'recovery',
+    loadComponent: () =>
+      import('./shared/pages/login/recovery/recovery.page').then(
+        (m) => m.RecoveryPage
       ),
   },
   {
@@ -64,11 +72,10 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'reject-user',
+    path: 'content',
+    canActivate: [authGuard],
     loadComponent: () =>
-      import('./shared/pages/reject-user/reject-user.page').then(
-        (m) => m.RejectUserPage
-      ),
+      import('./shared/pages/content/content.page').then((m) => m.ContentPage),
   },
   {
     path: '',
