@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { ModalOptions } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular/standalone';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,7 @@ export class ViewServices {
   public isMobile: boolean = false;
   private modalController = inject(ModalController);
   private toastController = inject(ToastController);
+  spinnerService = inject(NgxSpinnerService);
 
   public isLogin = signal<boolean>(false);
   public isAdminPanel = signal<boolean>(false);
@@ -40,4 +42,15 @@ export class ViewServices {
     await toast.present();
   }
 
+  loadingSpinnerShow() {
+    this.spinnerService.show(undefined, {
+      bdColor: 'rgba(0, 0, 0, 0.8)',
+      color: '#0ea5e9',
+      size: 'medium',
+    });
+  }
+
+  loadingSpinnerHide() {
+    this.spinnerService.hide();
+  }
 }

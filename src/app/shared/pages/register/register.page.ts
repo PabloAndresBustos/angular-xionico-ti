@@ -59,6 +59,7 @@ export class RegisterPage implements OnInit {
 
   async submit() {
     if (this.registerForm.valid) {
+      this.viewSrvc.loadingSpinnerShow();
       try {
         const user = this.registerForm.value as User;
         const newUser = await this.servers.register(user);
@@ -69,6 +70,8 @@ export class RegisterPage implements OnInit {
       } catch (error: any) {
         const msgError = error.message || 'Ocurrió un error inesperado';
         this.viewSrvc.toastPresent(msgError, 'warning');
+      } finally {
+        this.viewSrvc.loadingSpinnerHide();
       }
     }
   }

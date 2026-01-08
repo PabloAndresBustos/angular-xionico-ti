@@ -54,7 +54,21 @@ export const routes: Routes = [
             (m) => m.SqlQueryPage
           ),
       },
+      {
+        path: 'distribuidoras',
+        loadComponent: () =>
+          import(
+            './shared/pages/admin/distribuidoras/distribuidoras.page'
+          ).then((m) => m.DistribuidorasPage),
+      },
     ],
+  },
+  {
+    path: 'reject-user',
+    loadComponent: () =>
+      import('./shared/pages/reject-user/reject-user.page').then(
+        (m) => m.RejectUserPage
+      ),
   },
   {
     path: '',
@@ -64,10 +78,5 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'login',
-    pathMatch: 'full',
-  },  {
-    path: 'distribuidoras',
-    loadComponent: () => import('./shared/pages/admin/distribuidoras/distribuidoras.page').then( m => m.DistribuidorasPage)
   },
-
 ];

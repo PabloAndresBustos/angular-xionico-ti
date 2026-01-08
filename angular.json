@@ -40,7 +40,11 @@
                 "output": "/"
               }
             ],
-            "styles": ["src/global.scss", "src/theme/variables.scss"],
+            "styles": [
+              "src/global.scss",
+              "src/theme/variables.scss",
+              "./node_modules/ngx-spinner/animations/square-jelly-box.css"
+            ],
             "scripts": [],
             "browser": "src/main.ts"
           },

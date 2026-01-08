@@ -1,6 +1,10 @@
 <app-section [title]="'CONSULTAS SQL'" [iconName]="'server-outline'" [data]="false" [subTitle]="''" [status]="false">
 </app-section>
 
+<ngx-spinner [fullScreen]="true" [type]="'square-jelly-box'">
+  <p style="color: white" > Cargando... </p>
+</ngx-spinner>
+
 @if (isReady()) {
 <div class="p-4 mx-auto w-full">
   <ion-card class="m-0 shadow-lg border border-gray-100">

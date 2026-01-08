@@ -14,6 +14,7 @@ import { ComponentsModule } from 'src/app/shared/modules/components/components-m
 import { SectionComponent } from 'src/app/shared/components/section/section.component';
 import { Servers } from 'src/app/shared/services/servers';
 import * as XLSX from 'xlsx';
+import { ViewServices } from 'src/app/shared/services/view-services';
 
 @Component({
   selector: 'app-sql-query',
@@ -45,6 +46,7 @@ export class SqlQueryPage implements OnInit {
   queryText = '';
 
   public servers = inject(Servers);
+  private viewSrv = inject(ViewServices);
 
   constructor() {
     effect(() => {
@@ -166,12 +168,15 @@ export class SqlQueryPage implements OnInit {
     };
 
     try {
+      this.viewSrv.loadingSpinnerShow();
       return await this.servers.updateDocument(path, {
         lastCommand: command,
       });
     } catch (error) {
       console.error('Error al enviar consulta SQL:', error);
       throw error;
+    } finally {
+      this.viewSrv.loadingSpinnerHide();
     }
   }
 
@@ -195,6 +200,7 @@ export class SqlQueryPage implements OnInit {
       this.selectedDist() === 'AMERICA' ? this.selectedIp : 'localhost';
 
     try {
+      this.viewSrv.loadingSpinnerShow();
       await this.sendSqlCommand(this.selectedDist(), server.id, {
         ip: ipFinal,
         dbName: dbFinal,
@@ -202,6 +208,8 @@ export class SqlQueryPage implements OnInit {
       });
     } catch (error) {
       this.isExecuting.set(false);
+    } finally {
+      this.viewSrv.loadingSpinnerHide();
     }
   }
 

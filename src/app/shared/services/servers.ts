@@ -220,6 +220,16 @@ export class Servers implements OnDestroy {
     if (userDoc.exists()) {
       const userData = userDoc.data() as User;
 
+      if(!userData.active){
+        this.router.navigateByUrl('/reject-user');
+        return null;
+      }
+
+      if(!userData.approved && userData.active){
+        this.router.navigateByUrl('/aprobation');
+        return null;
+      }
+
       if (userData.approved) {
         this.adminUser.set(false);
         this.supportUser.set(false);
@@ -240,10 +250,8 @@ export class Servers implements OnDestroy {
         this.userLogin.set(userData);
 
         return userData;
-      } else {
-        this.router.navigateByUrl('/aprobation');
-        return null;
       }
+      return userData;
     } else {
       this.viewSrv.toastPresent('Verifique usuario o contraseña', 'danger');
       throw new Error('El perfil de usuario no existe en la base de datos');

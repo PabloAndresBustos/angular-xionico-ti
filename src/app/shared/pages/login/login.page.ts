@@ -1,6 +1,5 @@
 import {
   Component,
-  CUSTOM_ELEMENTS_SCHEMA,
   inject,
   OnInit,
   signal,
@@ -26,7 +25,6 @@ import {
   alertCircleOutline,
   mailOutline,
 } from 'ionicons/icons';
-import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -37,9 +35,8 @@ import { environment } from '../../../../environments/environment';
     IonicElementsModule,
     ComponentsModule,
     CustomInputComponent,
-    ValidatorFormComponent,
+    ValidatorFormComponent
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LoginPage implements OnInit {
   private router = inject(Router);
@@ -69,6 +66,7 @@ export class LoginPage implements OnInit {
 
   async submit() {
     if (this.loginForm.valid) {
+      this.viewSrv.loadingSpinnerShow();
       const userLogin = this.loginForm.value as User;
 
       try {
@@ -84,21 +82,18 @@ export class LoginPage implements OnInit {
         }
       } catch (err: any) {
         this.viewSrv.toastPresent(err.message || 'Error', 'danger');
+      } finally {
+        this.viewSrv.loadingSpinnerHide();
       }
     }
   }
 
   async authenUser() {
     const loginData = this.crypto.getData('xionico_user_temp');
+
     if (!loginData) {
       this.viewSrv.toastPresent('No hay credenciales registradas', 'warning');
       return;
-    }
-
-    if(loginData){
-      const user = this.crypto.getData('xionico_user_temp');
-      console.log('loginData', loginData);
-      console.log(user);
     }
 
     const valid = await this.biometric.verify();

@@ -22,6 +22,7 @@ export class ActiveUsersPage implements OnInit {
   approvedUsers = input.required<User[]>();
   allServerData = input.required<User[]>();
   searchTerm = signal<string>('');
+
   private servers = inject(Servers);
 
   filteredUsers = computed(() => {

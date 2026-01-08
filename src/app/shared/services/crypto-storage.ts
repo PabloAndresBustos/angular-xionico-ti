@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import * as CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-js';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CryptoStorage {
-  private secretKey = 'Xionico!2026!BoT1';
+  private secretKey = environment.secretKey;
 
   saveData(key: string, data: any) {
     const encryptedData = CryptoJS.AES.encrypt(

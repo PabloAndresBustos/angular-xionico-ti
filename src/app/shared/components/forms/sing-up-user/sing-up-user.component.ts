@@ -25,6 +25,7 @@ import {
 } from 'ionicons/icons';
 import { Servers } from 'src/app/shared/services/servers';
 import { CustomSelectComponent } from '../custom-select/custom-select.component';
+import { ViewServices } from 'src/app/shared/services/view-services';
 
 @Component({
   selector: 'app-sing-up-user',
@@ -47,6 +48,7 @@ export class SingUpUserComponent implements OnInit {
   selectedDist = signal<string>('');
 
   private servers = inject(Servers);
+  private viewSrv = inject(ViewServices);
 
   cardForm!: FormGroup;
 
@@ -95,6 +97,8 @@ export class SingUpUserComponent implements OnInit {
     const path = `users/${this.user().uid}`;
 
     try {
+      this.viewSrv.loadingSpinnerShow();
+
       const updateData = {
         ...this.cardForm.getRawValue(),
         approved: true,
@@ -104,6 +108,8 @@ export class SingUpUserComponent implements OnInit {
       await this.servers.updateDocument(path, updateData);
     } catch (error) {
       console.error(error);
+    } finally {
+      this.viewSrv.loadingSpinnerHide();
     }
   }
 
@@ -111,6 +117,8 @@ export class SingUpUserComponent implements OnInit {
     const path = `users/${this.user().uid}`;
 
     try {
+      this.viewSrv.loadingSpinnerShow();
+
       const updateData = {
         approved: false,
         active: false,
@@ -119,6 +127,8 @@ export class SingUpUserComponent implements OnInit {
       console.log('Solicitud eliminada correctamente');
     } catch (error) {
       console.error('Error al eliminar:', error);
+    } finally {
+      this.viewSrv.loadingSpinnerHide();
     }
   }
 
