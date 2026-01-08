@@ -1,0 +1,86 @@
+.reporte-ia {
+  margin-top: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border-left: 5px solid var(--ion-color-secondary);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  .markdown-body {
+    white-space: pre-wrap; // Mantiene los saltos de línea de Gemini
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    line-height: 1.6;
+  }
+
+  h3 {
+    color: var(--ion-color-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.filter-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+
+  .custom-item {
+    --background: #f4f5f8;
+    --border-radius: 8px;
+    margin-top: 8px;
+    padding: 4px 8px;
+  }
+}
+
+.reporte-ia-container {
+  margin-top: 24px;
+  border-radius: 16px;
+  border: none;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  ion-card-header {
+    --background: #0054e9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    ion-card-title {
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  }
+
+  .markdown-body {
+    background: #ffffff;
+    padding: 20px;
+
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: 14px;
+      color: #2c3e50;
+      line-height: 1.6;
+      margin: 0;
+
+      // Estilo para los títulos que genera Gemini (###)
+      strong {
+        color: #0054e9;
+        display: block;
+        margin-top: 15px;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+.analyze-btn {
+  --border-radius: 8px;
+  font-weight: 600;
+  height: 36px;
+}

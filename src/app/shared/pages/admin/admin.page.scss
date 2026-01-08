@@ -1,0 +1,22 @@
+.menu-xionico {
+  --background: var(--ion-xionico-color) !important;
+
+  .transparent-list {
+    background: transparent !important;
+    padding: 0;
+  }
+
+  ion-item {
+
+    --background: transparent !important;
+    --color: #333;
+
+    ion-icon {
+      color: var(--ion-color-primary);
+    }
+
+    &:hover {
+      --background: rgba(0, 0, 0, 0.05) !important;
+    }
+  }
+}

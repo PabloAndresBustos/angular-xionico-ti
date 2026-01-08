@@ -67,7 +67,6 @@ export class SingUpUserComponent implements OnInit {
     effect(() => {
       const value = this.getControl('distribuidoraAsignada').value;
       this.selectedDist.set(value);
-      console.log('Distribuidora seleccionada:', value);
     });
   }
 

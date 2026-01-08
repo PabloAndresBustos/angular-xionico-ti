@@ -1,5 +1,5 @@
 <ngx-spinner [fullScreen]="true" [type]="'square-jelly-box'">
-  <p style="color: white" > Cargando... </p>
+  <p style="color: white"> Cargando... </p>
 </ngx-spinner>
 
 <div class="bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-full">
@@ -26,9 +26,9 @@
         [isPassword]="false" [iconName]="'business-outline'" [class]="'wfull'" />
     </div>
 
-     <app-custom-select label="Rol del Usuario" icon="layers-outline" [control]="getControl('role')">
+    <app-custom-select label="Rol del Usuario" icon="layers-outline" [control]="getControl('role')">
       @if(adminUser()) {
-        <ion-select-option [value]="0">Admin</ion-select-option>
+      <ion-select-option [value]="0">Admin</ion-select-option>
       }
       <ion-select-option [value]="1">Soporte</ion-select-option>
       <ion-select-option [value]="2">Usuario</ion-select-option>
@@ -45,7 +45,8 @@
     </div>
 
     <app-custom-select label="Distribuidora Asignada" icon="business-outline"
-      [control]="getControl('distribuidoraAsignada')" [options]="uniqueDistributors()" (selectionChange)="distSelect($event)">
+      [control]="getControl('distribuidoraAsignada')" [options]="uniqueDistributors()"
+      (selectionChange)="distSelect($event)">
     </app-custom-select>
 
     <app-custom-select label="Sucursales" icon="map-outline" [multiple]="true" [control]="getControl('sucursales')"
@@ -58,7 +59,7 @@
     </ion-button>
 
     @if(adminUser()){
-      <div class="relative flex py-2 items-center">
+    <div class="relative flex py-2 items-center">
       <div class="flex-grow border-t border-gray-200"></div>
       <span class="flex-shrink mx-2 text-gray-300 text-xs italic">o</span>
       <div class="flex-grow border-t border-gray-200"></div>

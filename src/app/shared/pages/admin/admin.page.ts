@@ -27,7 +27,13 @@ import {
   downloadOutline,
   closeCircle,
   copyOutline,
-  shieldCheckmarkOutline
+  shieldCheckmarkOutline,
+  logoGoogle,
+  documentTextOutline,
+  sparklesOutline,
+  sparkles,
+  cloudDownloadOutline,
+  documentText
 } from 'ionicons/icons';
 
 
@@ -42,7 +48,7 @@ import {
     UsersSingUpPage,
     ActiveUsersPage,
     SqlQueryPage,
-    DistribuidorasPage
+    DistribuidorasPage,
 ],
 })
 export class AdminPage implements OnInit, OnDestroy {
@@ -65,7 +71,13 @@ export class AdminPage implements OnInit, OnDestroy {
       downloadOutline,
       closeCircle,
       copyOutline,
-      shieldCheckmarkOutline
+      shieldCheckmarkOutline,
+      logoGoogle,
+      documentTextOutline,
+      sparklesOutline,
+      sparkles,
+      cloudDownloadOutline,
+      documentText
     });
   }
 

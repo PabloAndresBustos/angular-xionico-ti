@@ -1,8 +1,133 @@
-<app-section [title]="'En construccion'" [subTitle]="''" [data]="[]" [serversInSelectedDist]="[]" [selectedServerId]="''"
-  [status]="false" [iconName]="'business-outline'">
+<app-section [title]="'REPORTES'" [subTitle]="''" [data]="[]" [serversInSelectedDist]="[]" [selectedServerId]="''"
+  [status]="false" [iconName]="'document-text-outline'">
 </app-section>
-<div>
-  <span>
-    PROXIMAMENTE
-  </span>
+
+<ngx-spinner [fullScreen]="true" [type]="'square-jelly-box'">
+  <p style="color: white"> Cargando... </p>
+</ngx-spinner>
+
+@if (!conectado) {
+<div class="flex flex-col items-center min-h-screen p-6">
+
+  <div
+    class="max-w-md w-full bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col items-center text-center">
+
+    <div class="bg-blue-50 p-6 rounded-full mb-3">
+      <ion-icon name="cloud-outline" class="text-7xl" color="danger"></ion-icon>
+    </div>
+
+    <ion-text color="dark">
+      <h1 class="text-2xl font-bold mb-2">Gestión de Logs</h1>
+    </ion-text>
+
+    <p class="text-gray-500 text-base leading-relaxed mb-8">
+      Conéctate a Google Drive para acceder a los archivos de las distribuidoras.
+    </p>
+
+    <div class="w-full h-px bg-gray-100 mb-8"></div>
+
+    <ion-button (click)="conectarYListar()" expand="block" shape="round">
+      <ion-icon name="logo-google" slot="start" class="mr-2"></ion-icon>
+      Conectar con Google Drive
+    </ion-button>
+
+  </div>
 </div>
+}
+
+@if (conectado) {
+<div class="fade-in">
+
+  <ion-card class="filter-card">
+    <ion-card-header class="bg-(--ion-xionico-color) px-4 py-2">
+      <div class="flex justify-between items-center w-full">
+        <ion-card-title class="text-white text-lg font-bold">
+          Filtros de busqueda
+        </ion-card-title>
+      </div>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" size-md="6">
+            <ion-item lines="none" class="custom-item">
+              <ion-label position="stacked">Distribuidora</ion-label>
+              <ion-select placeholder="Seleccione una" (ionChange)="cargarSucursales($event.detail.value)"
+                interface="popover">
+                @for (d of distribuidoras; track d.id) {
+                <ion-select-option [value]="d.id">{{ d.name }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+          </ion-col>
+
+          <ion-col size="12" size-md="6">
+            @if (sucursales.length > 0) {
+            <ion-item lines="none" class="custom-item">
+              <ion-label position="stacked">Sucursal</ion-label>
+              <ion-select placeholder="Seleccione una" (ionChange)="cargarArchivos($event.detail.value)"
+                interface="popover">
+                @for (s of sucursales; track s.id) {
+                <ion-select-option [value]="s.id">{{ s.name }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+            }
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  @if (logs.length > 0) {
+  <ion-list lines="full" class="ion-margin-top">
+    <div class="relative flex py-2 items-center mb-4">
+      <div class="flex-grow border-t border-gray-300"></div>
+      <span class="flex-shrink mx-2 text-gray-400 text-lg italic">Archivos de este mes</span>
+      <div class="flex-grow border-t border-gray-300"></div>
+    </div>
+
+    @for (log of logs; track log.id) {
+    <div class="flex items-center justify-center">
+      <ion-item class="log-item w-[75%]">
+        <ion-icon name="document-text-outline" slot="start" color="primary" size="large" class="mr-2"></ion-icon>
+        <ion-label>
+          <h2 class="file-name">{{ log.name }}</h2>
+          <p>{{ (log.size / 1024).toFixed(2) }} KB</p>
+        </ion-label>
+        <ion-button slot="end" fill="solid" color="primary" (click)="prepararAnalisis(log.id)" class="analyze-btn">
+          <ion-icon name="sparkles" slot="start" class="mr-2"></ion-icon>
+          ANALIZAR
+        </ion-button>
+      </ion-item>
+    </div>
+
+    }
+  </ion-list>
+  } @else if (sucursales.length > 0) {
+  <p class="ion-padding-start">No se encontraron archivos en esta sucursal.</p>
+  } @if (reporteGenerado) {
+  <ion-card id="printable-report" class="reporte-ia-container ion-margin-top">
+    <ion-card-header class="bg-(--ion-xionico-color) px-4 py-2">
+      <div class="flex justify-between items-center w-full">
+        <ion-card-title class="text-white text-lg font-bold">
+          Analisis del log
+        </ion-card-title>
+      </div>
+    </ion-card-header>
+
+    <ion-card-content class="ion-padding markdown-body">
+      <pre style="white-space: pre-wrap; font-family: inherit;">{{ reporteGenerado }}</pre>
+    </ion-card-content>
+
+    <div class="ion-padding">
+      <ion-button expand="block" color="dark">
+        <ion-icon name="cloud-download-outline" slot="start" class="mr-2"></ion-icon>
+        Descargar Informe PDF
+      </ion-button>
+    </div>
+  </ion-card>
+  }
+
+</div> }
