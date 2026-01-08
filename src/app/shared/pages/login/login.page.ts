@@ -6,6 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { CryptoStorage } from '../../services/crypto-storage';
 import { CustomInputComponent } from '../../components/forms/custom-input/custom-input.component';
 import { Router } from '@angular/router';
 import { ViewServices } from '../../services/view-services';
@@ -25,6 +26,7 @@ import {
   alertCircleOutline,
   mailOutline,
 } from 'ionicons/icons';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -44,6 +46,7 @@ export class LoginPage implements OnInit {
   private viewSrv = inject(ViewServices);
   private servers = inject(Servers);
   private biometric = inject(Biometric);
+  private crypto = inject(CryptoStorage);
 
   biometricData = signal<boolean>(false);
 
@@ -86,10 +89,16 @@ export class LoginPage implements OnInit {
   }
 
   async authenUser() {
-    const loginData = localStorage.getItem('xionico_user_temp');
+    const loginData = this.crypto.getData('xionico_user_temp');
     if (!loginData) {
       this.viewSrv.toastPresent('No hay credenciales registradas', 'warning');
       return;
+    }
+
+    if(loginData){
+      const user = this.crypto.getData('xionico_user_temp');
+      console.log('loginData', loginData);
+      console.log(user);
     }
 
     const valid = await this.biometric.verify();

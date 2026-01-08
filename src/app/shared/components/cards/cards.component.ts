@@ -33,7 +33,6 @@ import {
   informationCircleOutline,
 } from 'ionicons/icons';
 
-
 @Component({
   selector: 'app-cards',
   templateUrl: './cards.component.html',
@@ -56,6 +55,9 @@ export class CardsComponent implements OnInit {
 
   DISTRIBUIDORA_ID = input<string>('');
   SERVER_ID = input<string>('');
+
+  popoverOpen = false;
+  popoverEvent: Event | null = null;
 
   servers = inject(Servers);
 
@@ -102,6 +104,11 @@ export class CardsComponent implements OnInit {
 
   backupColor(status: string): string {
     return status === 'OK' ? 'xionico' : 'danger';
+  }
+
+  openPopover(event: Event) {
+    this.popoverEvent = event;
+    this.popoverOpen = true;
   }
 
   async toggleService(service: any) {

@@ -1,15 +1,7 @@
 export const environment = {
   production: true,
 
-  firebaseConfig: {
-    apiKey: 'AIzaSyByNesfULmznQP3mJCJb2PcNcWlLjGRY_w',
-    authDomain: 'soporteti-bo.firebaseapp.com',
-    projectId: 'soporteti-bo',
-    storageBucket: 'soporteti-bo.firebasestorage.app',
-    messagingSenderId: '420573400400',
-    appId: '1:420573400400:web:4c22401694b3d86bc83055',
-    measurementId: 'G-EPJ041PJSB',
-  },
+  firebaseKey: 'U2FsdGVkX18aD4U5K17687C1UmKZGVABxs37iCIfPMMQur7MJHvNYEfgTmZguJ1N7gsvYPs12CpuT3fSN30dfdj9pJpfNZFon5XO0KNGfUZ3nWwUt/wMQf7NcISkCZpuvG49v0V2sr+SHjx1RPMQBt/T2qPMqlMOdodvjtn69pWFaAjPsZOcg9H623QIQhPcUvpHLhmGzPoP93ZkquWPIW86WWm4ZgbXNVr/yarR4jSM1yAPZi5APncR1f3hsvGQ7EGdomc9MBeD0XSmRMTKTR9Yy9rqcaUgGIDHFxQnaxmMqzB2abecHdN2XqGNjDMFM7CAKAPQQ5xqeYT2SWUSFQEu5Bp5xjQ+TxsgpSOkyCBYsSdbbI5ShXs6Cq2bQOHmbb0O0yWypKXF3nce1F5eHeJ6u4kY1zgKCGcLSr2+xDg=',
 
   userProfile: {
     admin: 0,

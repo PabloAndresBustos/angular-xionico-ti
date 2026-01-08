@@ -1,4 +1,4 @@
-import { provideZoneChangeDetection, isDevMode } from '@angular/core';
+import { provideZoneChangeDetection, isDevMode, inject } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import {
   RouteReuseStrategy,
@@ -13,6 +13,7 @@ import {
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { provideHttpClient } from '@angular/common/http';
+import { CryptoStorage } from './app/shared/services/crypto-storage';
 
 /* Firebase and Firestore */
 import { environment } from './environments/environment';
@@ -22,6 +23,13 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { provideServiceWorker } from '@angular/service-worker';
 
+const getFirebaseConfig = () => {
+  const crypto = inject(CryptoStorage);
+  const encryptedKey = environment.firebaseKey;
+  const decryptedKey = crypto.decryptData(encryptedKey);
+  return decryptedKey;
+}
+
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(),
@@ -29,7 +37,7 @@ bootstrapApplication(AppComponent, {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    provideFirebaseApp(() => initializeApp(getFirebaseConfig())),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
     provideStorage(() => getStorage()),

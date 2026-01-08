@@ -197,7 +197,8 @@
               <div class="flex items-center justify-end gap-2 text-medium">
                 @if(transferencias()?.files?.length){
                 <ion-icon name="information-circle-outline" color="primary" id="click-trigger"
-                  class="text-[20px] cursor-pointer">
+                  class="text-[20px] cursor-pointer"
+                  (click)="openPopover($event)">
                 </ion-icon>
                 }
                 <span class="text-[16px] leading-none">
@@ -208,7 +209,7 @@
           </div>
         </ion-item>
 
-        <ion-popover trigger="click-trigger" triggerAction="click" alignment="center">
+        <ion-popover [isOpen]="popoverOpen" [event]="popoverEvent" alignment="center" (didDismiss)="popoverOpen = false">
           <ng-template>
             <ion-content class="ion-padding">
               <ion-list-header>

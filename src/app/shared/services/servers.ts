@@ -32,18 +32,27 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
+import { CryptoStorage } from './crypto-storage';
+
+const getFirebaseConfig = () => {
+  const crypto = inject(CryptoStorage);
+  const encryptedKey = environment.firebaseKey;
+  const decryptedKey = crypto.decryptData(encryptedKey);
+  return decryptedKey
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class Servers implements OnDestroy {
-  private app = initializeApp(environment.firebaseConfig);
+  private app = initializeApp(getFirebaseConfig());
   public db = getFirestore(this.app);
   private auth = getAuth(this.app);
   private unsubscribeList: Unsubscribe | null = null;
   private router = inject(Router);
   private viewSrv = inject(ViewServices);
   private biometric = inject(Biometric);
+  private crypto = inject(CryptoStorage);
 
   allServersData = signal<any[]>([]);
   authService = signal<User | null>(null);
@@ -53,6 +62,7 @@ export class Servers implements OnDestroy {
   allUsers = signal<User[]>([]);
   aprovedUsers = signal<User[]>([]);
   userLogin = signal<User>({} as User);
+
 
   constructor() {
     this.listenToAuthChanges();
@@ -218,7 +228,7 @@ export class Servers implements OnDestroy {
 
         if (availableBio && !bioIsRegister) {
           await this.biometric.registerBio(userData.email);
-          localStorage.setItem('xionico_user_temp', JSON.stringify(user));
+          this.crypto.saveData('xionico_user_temp', JSON.stringify(user));
         }
 
         if (userData.role === 0) {
