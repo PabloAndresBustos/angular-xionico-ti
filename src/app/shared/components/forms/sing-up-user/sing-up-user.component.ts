@@ -95,12 +95,11 @@ export class SingUpUserComponent implements OnInit {
   async onConfirm() {
     const path = `users/${this.user().uid}`;
 
+    this.viewSrv.loadingSpinnerShow();
     try {
-      this.viewSrv.loadingSpinnerShow();
-
       const updateData = {
         ...this.cardForm.getRawValue(),
-        approved: true,
+        approved: this.getControl('approved').value,
         active: true,
       };
 
@@ -115,9 +114,8 @@ export class SingUpUserComponent implements OnInit {
   async onReject() {
     const path = `users/${this.user().uid}`;
 
+    this.viewSrv.loadingSpinnerShow();
     try {
-      this.viewSrv.loadingSpinnerShow();
-
       const updateData = {
         approved: false,
         active: false,
