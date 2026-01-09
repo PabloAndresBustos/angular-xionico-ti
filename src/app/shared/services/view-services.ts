@@ -4,18 +4,20 @@ import { ModalController } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular/standalone';
 import { NgxSpinnerService } from 'ngx-spinner';
 
+
 @Injectable({
   providedIn: 'root',
 })
 export class ViewServices {
   public fingerPrint: boolean = false;
-  public isMobile: boolean = false;
   private modalController = inject(ModalController);
   private toastController = inject(ToastController);
   spinnerService = inject(NgxSpinnerService);
 
   public isLogin = signal<boolean>(false);
   public isAdminPanel = signal<boolean>(false);
+  public biometricData = signal<boolean>(false);
+  public isMobile = signal<boolean>(false);
 
   async presentModal(opts: ModalOptions) {
     const modal = await this.modalController.create(opts);
@@ -53,4 +55,5 @@ export class ViewServices {
   loadingSpinnerHide() {
     this.spinnerService.hide();
   }
+
 }

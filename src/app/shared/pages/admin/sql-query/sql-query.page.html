@@ -32,7 +32,7 @@
 
         <ion-item lines="outline" class="rounded-lg" [disabled]="selectedDist() !== 'AMERICA' || !selectedServer()">
           <ion-label position="stacked" class="font-bold text-primary">Sucursal Destino (IP)</ion-label>
-          <ion-select placeholder="Seleccione IP..." [(ngModel)]="selectedIp">
+          <ion-select (ionChange)="onIpChange($event)" placeholder="Seleccione IP..." [(ngModel)]="selectedIp">
             @for (item of availableIps(); track item.ip) {
             <ion-select-option [value]="item.ip">
               {{ item.nombre }}: {{ item.ip }}
@@ -97,7 +97,8 @@
   <div class="mt-6">
 
     @if (queryData().length > 0 && !isExecuting()) {
-    <div class="overflow-x-auto border border-gray-200 rounded-xl shadow-2xl bg-white animate__animated animate__fadeIn">
+    <div
+      class="overflow-x-auto border border-gray-200 rounded-xl shadow-2xl bg-white animate__animated animate__fadeIn">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-800">
           <tr>
@@ -131,30 +132,48 @@
     }
 
     @else if (isExecuting()) {
-    <div class="flex flex-col items-center justify-center p-16 text-blue-600 bg-blue-50 rounded-xl border border-blue-100 shadow-inner">
+    <div
+      class="flex flex-col items-center justify-center p-16 text-blue-600 bg-blue-50 rounded-xl border border-blue-100 shadow-inner">
       <ion-spinner name="crescent" color="primary" class="scale-150"></ion-spinner>
       <span class="mt-6 font-bold italic text-lg animate-pulse">Consultando servidor remoto...</span>
     </div>
     }
 
-    @else if (lastCommand()?.status === 'ERROR' && queryData().length === 0) {
-    <div class="p-6 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-lg animate__animated animate__shakeX">
+    @else if (errorMessage() && !isExecuting()) {
+    <div
+      class="p-6 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-lg animate__animated animate__shakeX">
       <div class="flex items-center mb-3">
         <ion-icon name="alert-circle" class="text-3xl mr-2"></ion-icon>
         <strong class="text-xl">Error de Motor SQL</strong>
       </div>
-      <pre class="bg-gray-900 text-red-400 p-5 rounded-lg overflow-x-auto text-sm font-mono shadow-inner border border-red-300">
+      <pre
+        class="bg-gray-900 text-red-400 p-5 rounded-lg overflow-x-auto text-sm font-mono shadow-inner border border-red-300">
+        {{ errorMessage() }}
+      </pre>
+    </div>
+    }
+
+    @else if (lastCommand()?.status === 'ERROR' && queryData().length === 0) {
+    <div
+      class="p-6 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-lg animate__animated animate__shakeX">
+      <div class="flex items-center mb-3">
+        <ion-icon name="alert-circle" class="text-3xl mr-2"></ion-icon>
+        <strong class="text-xl">Error de Motor SQL</strong>
+      </div>
+      <pre
+        class="bg-gray-900 text-red-400 p-5 rounded-lg overflow-x-auto text-sm font-mono shadow-inner border border-red-300">
         {{ lastCommand()?.error }}
       </pre>
     </div>
     }
 
-    @else if (!isExecuting() && queryData().length === 0 && lastCommand()?.status === 'SUCCESS') {
-    <div class="p-8 bg-amber-50 text-amber-700 rounded-xl border border-amber-200 text-center italic flex flex-col items-center">
+    <!-- @else if (!isExecuting() && queryData().length === 0 && !errorMessage() && selectedDist() !== '') {
+    <div
+      class="p-8 bg-amber-50 text-amber-700 rounded-xl border border-amber-200 text-center italic flex flex-col items-center">
       <ion-icon name="information-circle-outline" class="text-3xl mb-2"></ion-icon>
       La consulta se completó correctamente, pero no se encontraron registros que coincidan.
     </div>
-    }
+    } -->
 
   </div>
 </div>

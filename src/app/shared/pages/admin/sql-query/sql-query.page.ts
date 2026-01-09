@@ -41,7 +41,7 @@ export class SqlQueryPage implements OnInit {
   allServerData = input.required<any[]>();
   fijarColumnas = signal<string[]>([]);
   lastProcessedRequest = signal<string>('');
-  public results = signal<any[]>([]);
+  errorMessage = signal<string | null>(null);
   manualDbName: string = '';
 
   selectedIp = '';
@@ -78,8 +78,15 @@ export class SqlQueryPage implements OnInit {
     return this.servers.userLogin();
   }
 
+  onIpChange(ev: any){
+    this.errorMessage.set(null);
+    this.queryData.set([]);
+  }
+
   onDistChange(ev: any) {
     this.selectedDist.set(ev.detail.value);
+    this.queryData.set([]);
+    this.errorMessage.set(null);
     this.selectedServer.set(null);
     this.selectedIp = '';
     this.selectedDbName = '';
@@ -87,6 +94,9 @@ export class SqlQueryPage implements OnInit {
 
   onServerChange(ev: any) {
     this.selectedServer.set(ev.detail.value);
+
+    this.queryData.set([]);
+    this.errorMessage.set(null);
 
     if (this.selectedDist() === 'AMERICA') {
       this.selectedIp = '';
@@ -103,7 +113,7 @@ export class SqlQueryPage implements OnInit {
       this.selectedDist() &&
       this.selectedServer() &&
       dbFinal &&
-      this.queryText.trim().length > 10;
+      this.queryText.toUpperCase().trim().length > 10;
 
     if (this.selectedDist() === 'AMERICA') {
       return common && this.selectedIp;
@@ -156,7 +166,6 @@ export class SqlQueryPage implements OnInit {
 
   async ejecutarConsulta() {
     const server = this.selectedServer();
-    // Validaciones iniciales
     if (!server?.id || this.isExecuting()) return;
 
     const dbFinal =
@@ -169,38 +178,33 @@ export class SqlQueryPage implements OnInit {
       return;
     }
 
+    this.errorMessage.set(null);
     this.isExecuting.set(true);
     this.viewSrv.loadingSpinnerShow();
 
-    // Determinar IP (Localhost para distribuidoras normales, seleccionada para AMERICA)
     let ipFinal = this.selectedDist() === 'AMERICA' ? this.selectedIp : 'localhost';
+    const queryFinal = `USE [${dbFinal}]; ${this.queryText.toUpperCase().trim()}`;
 
     try {
-      // 1. Enviamos el comando a la cola de Firebase
       const docRef = await this.sendSqlCommand(this.selectedDist(), server.id, {
         ip: ipFinal,
         dbName: dbFinal,
-        query: this.queryText,
+        query: queryFinal,
       });
 
-      // 2. Escuchamos en tiempo real el documento creado en la cola
       const unsub = onSnapshot(docRef, (snap) => {
         const data = snap.data() as CommandResponse;
 
         if (!data) return;
 
-        // Caso: ÉXITO
         if (data.status === 'SUCCESS') {
-          // Obtener los resultados (pueden venir como Array o como String JSON)
           const rawResults = data.results ?? [];
 
           try {
             const finalData = typeof rawResults === 'string' ? JSON.parse(rawResults) : rawResults;
 
-            // Actualizamos los datos de la tabla
             this.queryData.set(finalData);
 
-            // Extraemos las columnas del primer objeto si existen resultados
             if (Array.isArray(finalData) && finalData.length > 0) {
               const columnasExtraidas = Object.keys(finalData[0]);
               this.fijarColumnas.set(columnasExtraidas);
@@ -213,22 +217,21 @@ export class SqlQueryPage implements OnInit {
             console.error('Error al parsear los resultados del servidor:', parseError);
           }
 
+          this.errorMessage.set(null);
           this.viewSrv.loadingSpinnerHide();
           this.isExecuting.set(false);
-          unsub(); // Importante: dejar de escuchar una vez completado
+          unsub();
         }
 
-        // Caso: ERROR en el Backend
         else if (data.status === 'ERROR') {
           console.error('Error reportado por el servidor:', data.error);
+          this.errorMessage.set(data.error || 'Error desconocido en el servidor.');
           this.viewSrv.loadingSpinnerHide();
           this.isExecuting.set(false);
-          // Podrías añadir un alert aquí para informar al usuario del error de SQL
           unsub();
         }
       });
 
-      // 3. Timeout de seguridad (30 segundos)
       setTimeout(() => {
         if (this.isExecuting()) {
           console.warn('⏱️ Timeout: El servidor no respondió a tiempo.');

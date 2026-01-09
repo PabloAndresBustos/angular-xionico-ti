@@ -35,6 +35,8 @@ import {
   cloudDownloadOutline,
   documentText,
   clipboardOutline,
+  alertCircle,
+  personAddOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -81,6 +83,8 @@ export class AdminPage implements OnInit, OnDestroy {
       cloudDownloadOutline,
       documentText,
       clipboardOutline,
+      alertCircle,
+      personAddOutline
     });
   }
 
@@ -123,10 +127,10 @@ export class AdminPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.viewSrv.isAdminPanel.set(true);
 
-    this.cargarDatosPrueba();
+    /* this.cargarDatosPrueba(); */
   }
 
-  async cargarDatosPrueba() {
+  /* async cargarDatosPrueba() {
     const data = [
       { nombre: 'Bastari Pergamino', ip: '192.168.5.30' },
       { nombre: 'Topalen', ip: '192.168.5.35' },
@@ -161,7 +165,7 @@ export class AdminPage implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Error cargando datos:', error);
     }
-  }
+  } */
 
   ngOnDestroy(): void {
     this.viewSrv.isAdminPanel.set(false);

@@ -64,10 +64,6 @@ export class SingUpUserComponent implements OnInit {
       trashOutline,
     });
 
-    /* effect(() => {
-      const value = this.getControl('distribuidoraAsignada').value;
-      this.selectedDist.set(value);
-    }); */
   }
 
   getControl(name: string): FormControl {
@@ -138,17 +134,12 @@ export class SingUpUserComponent implements OnInit {
 
     if (!distControl || !sucControl) return;
 
-    // =========================
-    // ADMIN / NO USUARIO NORMAL
-    // =========================
     if (rolValue !== 2) {
-      // Distribuidora
       if (distControl.enabled || distControl.value !== 'TODAS') {
         distControl.setValue('TODAS', { emitEvent: false });
         distControl.disable({ emitEvent: false });
       }
 
-      // Sucursales
       if (sucControl.enabled || sucControl.value?.[0] !== 'TODAS') {
         sucControl.setValue(['TODAS'], { emitEvent: false });
         sucControl.disable({ emitEvent: false });
@@ -157,21 +148,14 @@ export class SingUpUserComponent implements OnInit {
       return;
     }
 
-    // =========================
-    // USUARIO NORMAL (ROL 2)
-    // =========================
-
-    // Habilitar distribuidora
     if (distControl.disabled) {
       distControl.enable({ emitEvent: false });
     }
 
-    // Si estaba forzada a TODAS, limpiamos
     if (distControl.value === 'TODAS') {
       distControl.setValue('', { emitEvent: false });
     }
 
-    // Habilitar / deshabilitar sucursales según distribuidora
     if (distControl.value && distControl.value !== '') {
       if (sucControl.disabled) {
         sucControl.enable({ emitEvent: false });

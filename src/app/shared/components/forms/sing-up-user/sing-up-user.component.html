@@ -36,7 +36,7 @@
 
     <div class="border-b border-gray-200">
       <ion-item lines="none" class="--background: transparent;">
-        <ion-icon name="checkmark-done-circle-outline" slot="start" color="xionico" class="opacity-60"></ion-icon>
+        <ion-icon name="checkmark-done-circle-outline" slot="start" color="xionico" class="opacity-60 mr-2"></ion-icon>
         <ion-select label="Estado de aprobación" label-placement="floating" [formControl]="getControl('approved')">
           <ion-select-option [value]="true">Sí</ion-select-option>
           <ion-select-option [value]="false">No</ion-select-option>
@@ -54,7 +54,7 @@
     </app-custom-select>
 
     <ion-button (click)="onConfirm()" expand="block" color="xionico" class="h-12 mt-6" [disabled]="cardForm.invalid">
-      <ion-icon slot="start" name="person-add-outline"></ion-icon>
+      <ion-icon slot="start" name="person-add-outline mr-2"></ion-icon>
       {{okButton()}}
     </ion-button>
 
@@ -66,7 +66,7 @@
     </div>
 
     <ion-button (click)="onReject()" expand="block" color="danger" class="h-12 font-bold shadow-lg">
-      <ion-icon slot="start" name="trash-outline"></ion-icon>
+      <ion-icon slot="start" name="trash-outline" class="mr-2"></ion-icon>
       {{redButton()}}
     </ion-button>
     }

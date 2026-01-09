@@ -24,6 +24,7 @@ import {
   fingerPrintOutline,
   alertCircleOutline,
   mailOutline,
+  keypadOutline,
 } from 'ionicons/icons';
 
 
@@ -57,6 +58,7 @@ export class LoginPage implements OnInit {
       fingerPrintOutline,
       alertCircleOutline,
       mailOutline,
+      keypadOutline
     });
   }
 
@@ -64,6 +66,10 @@ export class LoginPage implements OnInit {
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required]),
   });
+
+  platform(){
+    return this.viewSrv.isMobile()
+  }
 
   async submit() {
     if (this.loginForm.valid) {
@@ -127,6 +133,11 @@ export class LoginPage implements OnInit {
     const tempUser = localStorage.getItem('xionico_user_temp');
 
     this.biometricData.set(!!(bioId && tempUser))
+
+    if(this.biometricData()){
+      this.authenUser();
+    }
+
   }
 
   register() {

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { isPlatform } from '@ionic/angular';
 import { ViewServices } from './shared/services/view-services';
@@ -9,9 +9,9 @@ import { ViewServices } from './shared/services/view-services';
   templateUrl: 'app.component.html',
   imports: [IonApp, IonRouterOutlet],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
-  viewSrvc = inject(ViewServices);
+  private viewSrvc = inject(ViewServices);
 
   constructor() {
 
@@ -20,9 +20,16 @@ export class AppComponent {
     }
 
     if(isPlatform('android') || isPlatform('ios')){
-      this.viewSrvc.isMobile = true;
+      this.viewSrvc.isMobile.set(true);
     }
 
+  }
+
+
+  ngOnInit(): void {
+    /* if(this.viewSrvc.biometricData()){
+      this.viewSrvc.authenUser();
+    } */
   }
 
 }
