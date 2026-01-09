@@ -137,13 +137,14 @@ export class SingUpUserComponent implements OnInit {
     const sucControl = this.cardForm.get('sucursales');
 
     if (rolValue !== 2) {
+      // IMPORTANTE: emitEvent: false rompe el bucle infinito
       distControl?.setValue('TODAS', { emitEvent: false });
       sucControl?.setValue(['TODAS'], { emitEvent: false });
 
-      distControl?.disable();
-      sucControl?.disable();
+      distControl?.disable({ emitEvent: false });
+      sucControl?.disable({ emitEvent: false });
     } else {
-      distControl?.enable();
+      distControl?.enable({ emitEvent: false });
 
       if (distControl?.value === 'TODAS') {
         distControl.setValue('', { emitEvent: false });
@@ -154,10 +155,10 @@ export class SingUpUserComponent implements OnInit {
         distControl.value !== '' &&
         distControl.value !== 'TODAS'
       ) {
-        sucControl?.enable();
+        sucControl?.enable({ emitEvent: false });
       } else {
-        sucControl?.disable();
-        sucControl?.setValue([]);
+        sucControl?.disable({ emitEvent: false });
+        sucControl?.setValue([], { emitEvent: false });
       }
     }
   }

@@ -11,7 +11,7 @@ export class GoogleServices {
   private clientID = '420573400400-6nga1o0otf44ec3dqlptvvel37ik58ec.apps.googleusercontent.com';
   private scopes = 'https://www.googleapis.com/auth/drive.readonly';
   private rootFolderId = '1L1omMXmrFZwV8jkgHDRYIma15_1Y1lmB';
-  private genAI = new GoogleGenerativeAI('AIzaSyCiq4-IhQ8xn9Xk30_p6J10eHOVtpcTI0E');
+  private genAI = new GoogleGenerativeAI('AIzaSyDLH7aSzmpDea_dmNXMK4aKTpari8nOybk');
   private model = this.genAI.getGenerativeModel(
     { model: 'gemini-3-flash-preview' }
   );

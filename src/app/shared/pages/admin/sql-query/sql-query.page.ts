@@ -156,53 +156,88 @@ export class SqlQueryPage implements OnInit {
 
   async ejecutarConsulta() {
     const server = this.selectedServer();
+    // Validaciones iniciales
     if (!server?.id || this.isExecuting()) return;
 
     const dbFinal =
       this.selectedDbName === 'OTRA'
         ? this.manualDbName.trim()
         : this.selectedDbName;
-    if (!dbFinal) return;
+
+    if (!dbFinal) {
+      console.warn('Debe especificar una base de datos');
+      return;
+    }
 
     this.isExecuting.set(true);
     this.viewSrv.loadingSpinnerShow();
 
-    let ipFinal =
-      this.selectedDist() === 'AMERICA' ? this.selectedIp : 'localhost';
+    // Determinar IP (Localhost para distribuidoras normales, seleccionada para AMERICA)
+    let ipFinal = this.selectedDist() === 'AMERICA' ? this.selectedIp : 'localhost';
 
     try {
+      // 1. Enviamos el comando a la cola de Firebase
       const docRef = await this.sendSqlCommand(this.selectedDist(), server.id, {
         ip: ipFinal,
         dbName: dbFinal,
         query: this.queryText,
       });
 
+      // 2. Escuchamos en tiempo real el documento creado en la cola
       const unsub = onSnapshot(docRef, (snap) => {
         const data = snap.data() as CommandResponse;
 
-        if (data?.status === 'SUCCESS') {
-          const newData = data.results ?? [];
-          if (newData.length > 0) {
-            this.fijarColumnas.set(Object.keys(newData[0]));
+        if (!data) return;
+
+        // Caso: ÉXITO
+        if (data.status === 'SUCCESS') {
+          // Obtener los resultados (pueden venir como Array o como String JSON)
+          const rawResults = data.results ?? [];
+
+          try {
+            const finalData = typeof rawResults === 'string' ? JSON.parse(rawResults) : rawResults;
+
+            // Actualizamos los datos de la tabla
+            this.queryData.set(finalData);
+
+            // Extraemos las columnas del primer objeto si existen resultados
+            if (Array.isArray(finalData) && finalData.length > 0) {
+              const columnasExtraidas = Object.keys(finalData[0]);
+              this.fijarColumnas.set(columnasExtraidas);
+              console.log(`✅ Consulta exitosa: ${finalData.length} filas recibidas.`);
+            } else {
+              this.fijarColumnas.set([]);
+              console.warn('La consulta no devolvió filas.');
+            }
+          } catch (parseError) {
+            console.error('Error al parsear los resultados del servidor:', parseError);
           }
-          this.queryData.set(newData);
+
           this.viewSrv.loadingSpinnerHide();
           this.isExecuting.set(false);
-          unsub();
-        } else if (data?.status === 'ERROR') {
-          console.error('Error desde el servidor:', data.error);
+          unsub(); // Importante: dejar de escuchar una vez completado
+        }
+
+        // Caso: ERROR en el Backend
+        else if (data.status === 'ERROR') {
+          console.error('Error reportado por el servidor:', data.error);
           this.viewSrv.loadingSpinnerHide();
           this.isExecuting.set(false);
+          // Podrías añadir un alert aquí para informar al usuario del error de SQL
           unsub();
         }
       });
+
+      // 3. Timeout de seguridad (30 segundos)
       setTimeout(() => {
         if (this.isExecuting()) {
-          console.warn('⏱️ El servidor no respondió a tiempo (Timeout)');
+          console.warn('⏱️ Timeout: El servidor no respondió a tiempo.');
           this.finalizarEjecucion(unsub);
         }
       }, 30000);
+
     } catch (error) {
+      console.error('Error al iniciar la ejecución:', error);
       this.isExecuting.set(false);
       this.viewSrv.loadingSpinnerHide();
     }

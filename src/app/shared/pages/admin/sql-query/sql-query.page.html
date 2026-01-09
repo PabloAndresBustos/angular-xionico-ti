@@ -2,7 +2,7 @@
 </app-section>
 
 <ngx-spinner [fullScreen]="true" [type]="'square-jelly-box'">
-  <p style="color: white" > Cargando... </p>
+  <p style="color: white"> Cargando... </p>
 </ngx-spinner>
 
 @if (isReady()) {
@@ -41,7 +41,7 @@
           </ion-select>
         </ion-item>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1">
           <ion-item lines="outline" class="rounded-lg" [disabled]="!selectedServer()">
             <ion-label position="stacked" class="font-bold text-gray-600">Base de Datos</ion-label>
 
@@ -82,8 +82,8 @@
     </ion-card-content>
   </ion-card>
 
-  @if (queryData().length > 0 && (lastCommand()?.status === 'SUCCESS' || lastCommand()?.status === 'FINISHED')) {
-  <div class="flex justify-between items-center mb-4 mt-6 px-2">
+  @if (queryData().length > 0 && !isExecuting()) {
+  <div class="flex justify-between items-center mb-4 mt-6 px-2 animate__animated animate__fadeIn">
     <div class="text-sm text-gray-500 italic">
       Se encontraron <strong>{{ queryData().length }}</strong> registros.
     </div>
@@ -96,11 +96,8 @@
 
   <div class="mt-6">
 
-    @if (lastCommand()?.status === 'SUCCESS' || lastCommand()?.status === 'FINISHED') {
-
-    @if (queryData().length > 0) {
-    <div
-      class="overflow-x-auto border border-gray-200 rounded-xl shadow-2xl bg-white animate__animated animate__fadeIn">
+    @if (queryData().length > 0 && !isExecuting()) {
+    <div class="overflow-x-auto border border-gray-200 rounded-xl shadow-2xl bg-white animate__animated animate__fadeIn">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-800">
           <tr>
@@ -117,7 +114,6 @@
           <tr class="hover:bg-blue-50 transition-colors">
             @for (col of fijarColumnas(); track col) {
             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-r border-gray-50 last:border-0">
-
               @if (isTimestamp(row[col])) {
               <span class="font-medium text-blue-700">
                 {{ convertToDate(row[col]) | date:'dd/MM/yyyy HH:mm:ss' }}
@@ -125,7 +121,6 @@
               } @else {
               {{ row[col] !== null ? row[col] : '-' }}
               }
-
             </td>
             }
           </tr>
@@ -133,32 +128,31 @@
         </tbody>
       </table>
     </div>
-    } @else {
-    <div
-      class="p-8 bg-amber-50 text-amber-700 rounded-xl border border-amber-200 text-center italic flex flex-col items-center">
-      <ion-icon name="information-circle-outline" class="text-3xl mb-2"></ion-icon>
-      La consulta se completó correctamente, pero la tabla no contiene registros.
-    </div>
     }
 
-    } @else if (lastCommand()?.status === 'PENDING') {
-    <div
-      class="flex flex-col items-center justify-center p-16 text-blue-600 bg-blue-50 rounded-xl border border-blue-100 shadow-inner">
+    @else if (isExecuting()) {
+    <div class="flex flex-col items-center justify-center p-16 text-blue-600 bg-blue-50 rounded-xl border border-blue-100 shadow-inner">
       <ion-spinner name="crescent" color="primary" class="scale-150"></ion-spinner>
       <span class="mt-6 font-bold italic text-lg animate-pulse">Consultando servidor remoto...</span>
     </div>
+    }
 
-    } @else if (lastCommand()?.status === 'ERROR') {
-    <div
-      class="p-6 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-lg animate__animated animate__shakeX">
+    @else if (lastCommand()?.status === 'ERROR' && queryData().length === 0) {
+    <div class="p-6 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-lg animate__animated animate__shakeX">
       <div class="flex items-center mb-3">
         <ion-icon name="alert-circle" class="text-3xl mr-2"></ion-icon>
         <strong class="text-xl">Error de Motor SQL</strong>
       </div>
-      <pre
-        class="bg-gray-900 text-red-400 p-5 rounded-lg overflow-x-auto text-sm font-mono shadow-inner border border-red-300">
-          {{ lastCommand()?.error }}
-        </pre>
+      <pre class="bg-gray-900 text-red-400 p-5 rounded-lg overflow-x-auto text-sm font-mono shadow-inner border border-red-300">
+        {{ lastCommand()?.error }}
+      </pre>
+    </div>
+    }
+
+    @else if (!isExecuting() && queryData().length === 0 && lastCommand()?.status === 'SUCCESS') {
+    <div class="p-8 bg-amber-50 text-amber-700 rounded-xl border border-amber-200 text-center italic flex flex-col items-center">
+      <ion-icon name="information-circle-outline" class="text-3xl mb-2"></ion-icon>
+      La consulta se completó correctamente, pero no se encontraron registros que coincidan.
     </div>
     }
 
