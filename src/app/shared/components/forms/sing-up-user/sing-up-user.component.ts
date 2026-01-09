@@ -64,10 +64,10 @@ export class SingUpUserComponent implements OnInit {
       trashOutline,
     });
 
-    effect(() => {
+    /* effect(() => {
       const value = this.getControl('distribuidoraAsignada').value;
       this.selectedDist.set(value);
-    });
+    }); */
   }
 
   getControl(name: string): FormControl {
@@ -136,29 +136,50 @@ export class SingUpUserComponent implements OnInit {
     const distControl = this.cardForm.get('distribuidoraAsignada');
     const sucControl = this.cardForm.get('sucursales');
 
+    if (!distControl || !sucControl) return;
+
+    // =========================
+    // ADMIN / NO USUARIO NORMAL
+    // =========================
     if (rolValue !== 2) {
-      // IMPORTANTE: emitEvent: false rompe el bucle infinito
-      distControl?.setValue('TODAS', { emitEvent: false });
-      sucControl?.setValue(['TODAS'], { emitEvent: false });
-
-      distControl?.disable({ emitEvent: false });
-      sucControl?.disable({ emitEvent: false });
-    } else {
-      distControl?.enable({ emitEvent: false });
-
-      if (distControl?.value === 'TODAS') {
-        distControl.setValue('', { emitEvent: false });
+      // Distribuidora
+      if (distControl.enabled || distControl.value !== 'TODAS') {
+        distControl.setValue('TODAS', { emitEvent: false });
+        distControl.disable({ emitEvent: false });
       }
 
-      if (
-        distControl?.value &&
-        distControl.value !== '' &&
-        distControl.value !== 'TODAS'
-      ) {
-        sucControl?.enable({ emitEvent: false });
-      } else {
-        sucControl?.disable({ emitEvent: false });
-        sucControl?.setValue([], { emitEvent: false });
+      // Sucursales
+      if (sucControl.enabled || sucControl.value?.[0] !== 'TODAS') {
+        sucControl.setValue(['TODAS'], { emitEvent: false });
+        sucControl.disable({ emitEvent: false });
+      }
+
+      return;
+    }
+
+    // =========================
+    // USUARIO NORMAL (ROL 2)
+    // =========================
+
+    // Habilitar distribuidora
+    if (distControl.disabled) {
+      distControl.enable({ emitEvent: false });
+    }
+
+    // Si estaba forzada a TODAS, limpiamos
+    if (distControl.value === 'TODAS') {
+      distControl.setValue('', { emitEvent: false });
+    }
+
+    // Habilitar / deshabilitar sucursales según distribuidora
+    if (distControl.value && distControl.value !== '') {
+      if (sucControl.disabled) {
+        sucControl.enable({ emitEvent: false });
+      }
+    } else {
+      if (sucControl.enabled) {
+        sucControl.setValue([], { emitEvent: false });
+        sucControl.disable({ emitEvent: false });
       }
     }
   }
@@ -175,6 +196,12 @@ export class SingUpUserComponent implements OnInit {
       approved: new FormControl(true),
       deleted: new FormControl(this.user().active || false),
     });
+
+    this.cardForm
+      .get('distribuidoraAsignada')
+      ?.valueChanges.subscribe((value) => {
+        this.selectedDist.set(value);
+      });
 
     // 2. Carga de datos iniciales (Si es edición)
     const userData = this.user();
