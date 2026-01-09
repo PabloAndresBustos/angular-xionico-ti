@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { environment } from 'src/environments/environment';
 
 declare var google: any;
 
@@ -8,10 +9,10 @@ declare var google: any;
 })
 export class GoogleServices {
   private accessToken: string | null = null;
-  private clientID = '420573400400-6nga1o0otf44ec3dqlptvvel37ik58ec.apps.googleusercontent.com';
-  private scopes = 'https://www.googleapis.com/auth/drive.readonly';
-  private rootFolderId = '1L1omMXmrFZwV8jkgHDRYIma15_1Y1lmB';
-  private genAI = new GoogleGenerativeAI('AIzaSyD73SfAlIGnVcFj8QcbIlga0cYCSnyMrUY');
+  private clientID = environment.googleConfig.clientId;
+  private scopes = environment.googleConfig.scope;
+  private rootFolderId = environment.googleConfig.folderId;
+  private genAI = new GoogleGenerativeAI(environment.googleConfig.geminiId);
   private model = this.genAI.getGenerativeModel(
     { model: 'gemini-3-flash-preview' }
   );
@@ -22,7 +23,7 @@ export class GoogleServices {
     return new Promise((resolve, reject) => {
       const client = google.accounts.oauth2.initTokenClient({
         client_id: this.clientID,
-        scope: 'https://www.googleapis.com/auth/drive.readonly',
+        scope: this.scopes,
         callback: (response: any) => {
           if (response.error) {
             reject(response.error);
