@@ -15,6 +15,8 @@ import { SectionComponent } from 'src/app/shared/components/section/section.comp
 import { Servers } from 'src/app/shared/services/servers';
 import * as XLSX from 'xlsx';
 import { ViewServices } from 'src/app/shared/services/view-services';
+import { onSnapshot } from 'firebase/firestore';
+import { CommandResponse } from 'src/app/shared/models/commands.model';
 
 @Component({
   selector: 'app-sql-query',
@@ -39,6 +41,7 @@ export class SqlQueryPage implements OnInit {
   allServerData = input.required<any[]>();
   fijarColumnas = signal<string[]>([]);
   lastProcessedRequest = signal<string>('');
+  public results = signal<any[]>([]);
   manualDbName: string = '';
 
   selectedIp = '';
@@ -48,41 +51,7 @@ export class SqlQueryPage implements OnInit {
   public servers = inject(Servers);
   private viewSrv = inject(ViewServices);
 
-  constructor() {
-    effect(() => {
-      const server = this.selectedServer();
-      const current = this.allServerData().find((s) => s.id === server?.id);
-      const command = current?.lastCommand;
-
-      if (!command) return;
-
-      if (command.status === 'PENDING') {
-        this.isExecuting.set(true);
-        return;
-      }
-
-      if (command.status === 'SUCCESS' || command.status === 'FINISHED') {
-        if (command.requestedAt === this.lastProcessedRequest()) {
-          this.isExecuting.set(false);
-          return;
-        }
-
-        const newData = command.results || [];
-
-        if (newData.length > 0) {
-          this.fijarColumnas.set(Object.keys(newData[0]));
-        }
-        this.queryData.set(newData);
-
-        this.lastProcessedRequest.set(command.requestedAt);
-        this.isExecuting.set(false);
-      }
-
-      if (command.status === 'ERROR') {
-        this.isExecuting.set(false);
-      }
-    });
-  }
+  constructor() {}
 
   serversInDist = computed(() => {
     const dist = this.selectedDist();
@@ -105,7 +74,7 @@ export class SqlQueryPage implements OnInit {
     return o1 && o2 ? o1.id === o2.id : o1 === o2;
   };
 
-  userLogin(){
+  userLogin() {
     return this.servers.userLogin();
   }
 
@@ -147,7 +116,7 @@ export class SqlQueryPage implements OnInit {
     serverId: string,
     sqlData: { ip: string; dbName: string; query: string }
   ) {
-    const path = `distribuidoras/${distribuidoraId}/servidores/${serverId}`;
+    const path = `distribuidoras/${distribuidoraId}/servidores/${serverId}/commandsQueue`;
 
     const command = {
       action: 'EXECUTE_SQL',
@@ -162,22 +131,27 @@ export class SqlQueryPage implements OnInit {
           uid: this.userLogin().uid,
           name: this.userLogin().name,
           email: this.userLogin().email,
-        }
+        },
       },
       requestedAt: new Date().toISOString(),
+      createdAt: new Date(),
     };
 
     try {
       this.viewSrv.loadingSpinnerShow();
-      return await this.servers.updateDocument(path, {
-        lastCommand: command,
-      });
+      return await this.servers.addDocument(path, command);
     } catch (error) {
       console.error('Error al enviar consulta SQL:', error);
       throw error;
     } finally {
       this.viewSrv.loadingSpinnerHide();
     }
+  }
+
+  private finalizarEjecucion(unsubFn: () => void) {
+    unsubFn();
+    this.isExecuting.set(false);
+    this.viewSrv.loadingSpinnerHide();
   }
 
   async ejecutarConsulta() {
@@ -188,27 +162,48 @@ export class SqlQueryPage implements OnInit {
       this.selectedDbName === 'OTRA'
         ? this.manualDbName.trim()
         : this.selectedDbName;
-
-    if (!dbFinal) {
-      console.error('Debes especificar un nombre de base de datos');
-      return;
-    }
+    if (!dbFinal) return;
 
     this.isExecuting.set(true);
+    this.viewSrv.loadingSpinnerShow();
 
     let ipFinal =
       this.selectedDist() === 'AMERICA' ? this.selectedIp : 'localhost';
 
     try {
-      this.viewSrv.loadingSpinnerShow();
-      await this.sendSqlCommand(this.selectedDist(), server.id, {
+      const docRef = await this.sendSqlCommand(this.selectedDist(), server.id, {
         ip: ipFinal,
         dbName: dbFinal,
         query: this.queryText,
       });
+
+      const unsub = onSnapshot(docRef, (snap) => {
+        const data = snap.data() as CommandResponse;
+
+        if (data?.status === 'SUCCESS') {
+          const newData = data.results ?? [];
+          if (newData.length > 0) {
+            this.fijarColumnas.set(Object.keys(newData[0]));
+          }
+          this.queryData.set(newData);
+          this.viewSrv.loadingSpinnerHide();
+          this.isExecuting.set(false);
+          unsub();
+        } else if (data?.status === 'ERROR') {
+          console.error('Error desde el servidor:', data.error);
+          this.viewSrv.loadingSpinnerHide();
+          this.isExecuting.set(false);
+          unsub();
+        }
+      });
+      setTimeout(() => {
+        if (this.isExecuting()) {
+          console.warn('⏱️ El servidor no respondió a tiempo (Timeout)');
+          this.finalizarEjecucion(unsub);
+        }
+      }, 30000);
     } catch (error) {
       this.isExecuting.set(false);
-    } finally {
       this.viewSrv.loadingSpinnerHide();
     }
   }

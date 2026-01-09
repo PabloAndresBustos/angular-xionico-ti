@@ -24,6 +24,7 @@ import {
   DocumentData,
   collectionGroup,
   deleteDoc,
+  addDoc,
 } from 'firebase/firestore';
 import {
   Auth,
@@ -263,6 +264,11 @@ export class Servers implements OnDestroy {
   updateDocument(path: string, data: any) {
     const documentRef = doc(this.db, path);
     return updateDoc(documentRef, data);
+  }
+
+  addDocument(path: string, data: any) {
+    const collectionRef = collection(this.db, path);
+    return addDoc(collectionRef, data);
   }
 
   deleteDocument(path: string) {

@@ -13,7 +13,7 @@ import { BackupResponse } from '../../models/backup.model';
 import { HardwareInfo } from '../../models/hardware.model';
 import { Transferencias } from '../../models/trasnsferencias.models';
 import { Servers } from '../../services/servers';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
 import {
   thumbsUp,
@@ -32,6 +32,7 @@ import {
   cloudOfflineOutline,
   informationCircleOutline,
 } from 'ionicons/icons';
+import { ViewServices } from '../../services/view-services';
 
 @Component({
   selector: 'app-cards',
@@ -60,6 +61,7 @@ export class CardsComponent implements OnInit {
   popoverEvent: Event | null = null;
 
   servers = inject(Servers);
+  private viewSrv = inject(ViewServices);
 
   constructor() {
     addIcons({
@@ -114,23 +116,50 @@ export class CardsComponent implements OnInit {
   async toggleService(service: any) {
     const action = service.status === 'RUNNING' ? 'STOP' : 'START';
 
-    const path = `distribuidoras/${this.DISTRIBUIDORA_ID()}/servidores/${this.SERVER_ID()}`;
+    const path = `distribuidoras/${this.DISTRIBUIDORA_ID()}/servidores/${this.SERVER_ID()}/commandsQueue`;
+
+    const command = {
+      action: action,
+      serviceId: service.id,
+      status: 'PENDING',
+      params: {},
+      executeUser: {
+        uid: this.servers.userLogin().uid,
+        name: this.servers.userLogin().name,
+      },
+      requestedAt: new Date().toISOString(),
+      createdAt: new Date(),
+    };
 
     try {
-      const serverRef = doc(this.servers.db, path);
+      this.viewSrv.loadingSpinnerShow();
 
-      await updateDoc(serverRef, {
-        lastCommand: {
-          serviceId: service.id,
-          action: action,
-          timestamp: new Date().toISOString(),
-          status: 'PENDING',
-        },
+      const docRef = await this.servers.addDocument(path, command);
+
+      const unsub = onSnapshot(docRef, (snap) => {
+        const data = snap.data() as any;
+
+        if (data?.status === 'SUCCESS') {
+          console.log(
+            `✅ ${service.service} se ha ${
+              action === 'START' ? 'iniciado' : 'detenido'
+            }`
+          );
+          this.viewSrv.loadingSpinnerHide();
+          unsub();
+        } else if (data?.status === 'ERROR') {
+          console.error('❌ Error en el servicio:', data.error);
+          this.viewSrv.loadingSpinnerHide();
+          unsub();
+        }
       });
-
-      console.log(`✅ Comando ${action} enviado para ${service.service}`);
+      setTimeout(() => {
+        unsub();
+        this.viewSrv.loadingSpinnerHide();
+      }, 15000);
     } catch (error: any) {
       console.error('❌ Error al enviar comando:', error.message);
+      this.viewSrv.loadingSpinnerHide();
     }
   }
 

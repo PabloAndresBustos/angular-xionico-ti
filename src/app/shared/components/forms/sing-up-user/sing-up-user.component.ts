@@ -94,18 +94,21 @@ export class SingUpUserComponent implements OnInit {
 
   async onConfirm() {
     const path = `users/${this.user().uid}`;
-
     this.viewSrv.loadingSpinnerShow();
+
     try {
+      const rawData = this.cardForm.getRawValue();
+
       const updateData = {
-        ...this.cardForm.getRawValue(),
-        approved: this.getControl('approved').value,
+        ...rawData,
         active: true,
       };
 
       await this.servers.updateDocument(path, updateData);
+
+      console.log('✅ Usuario actualizado con éxito:', updateData);
     } catch (error) {
-      console.error(error);
+      console.error('❌ Error al actualizar usuario:', error);
     } finally {
       this.viewSrv.loadingSpinnerHide();
     }
@@ -129,10 +132,33 @@ export class SingUpUserComponent implements OnInit {
     }
   }
 
-  private checkRolePermissions(role: number) {
-    if (role === 0 || role === 1) {
-      this.cardForm.get('distribuidoraAsignada')?.disable();
-      this.cardForm.get('sucursales')?.disable();
+  checkRolePermissions(rolValue: number) {
+    const distControl = this.cardForm.get('distribuidoraAsignada');
+    const sucControl = this.cardForm.get('sucursales');
+
+    if (rolValue !== 2) {
+      distControl?.setValue('TODAS', { emitEvent: false });
+      sucControl?.setValue(['TODAS'], { emitEvent: false });
+
+      distControl?.disable();
+      sucControl?.disable();
+    } else {
+      distControl?.enable();
+
+      if (distControl?.value === 'TODAS') {
+        distControl.setValue('', { emitEvent: false });
+      }
+
+      if (
+        distControl?.value &&
+        distControl.value !== '' &&
+        distControl.value !== 'TODAS'
+      ) {
+        sucControl?.enable();
+      } else {
+        sucControl?.disable();
+        sucControl?.setValue([]);
+      }
     }
   }
 
@@ -149,6 +175,7 @@ export class SingUpUserComponent implements OnInit {
       deleted: new FormControl(this.user().active || false),
     });
 
+    // 2. Carga de datos iniciales (Si es edición)
     const userData = this.user();
     if (userData) {
       this.cardForm.patchValue({
@@ -159,13 +186,28 @@ export class SingUpUserComponent implements OnInit {
 
       if (userData.distribuidoraAsignada) {
         this.selectedDist.set(userData.distribuidoraAsignada);
-        const sucControl = this.cardForm.get('sucursales');
-
-        sucControl?.enable();
-        sucControl?.setValue(userData.sucursales || []);
       }
     }
 
+    // 3. SUSCRIPCIONES (Listeners proactivos)
+
+    // Escuchar cambios en el Rol
+    this.cardForm.get('role')?.valueChanges.subscribe((rolValue) => {
+      this.checkRolePermissions(rolValue);
+    });
+
+    // Escuchar cambios en la Distribuidora (CRÍTICO para habilitar sucursales al primer clic)
+    this.cardForm
+      .get('distribuidoraAsignada')
+      ?.valueChanges.subscribe((distValue) => {
+        const currentRole = this.cardForm.get('role')?.value;
+        // Si es un usuario normal (2), evaluamos si habilitar sucursales
+        if (currentRole === 2) {
+          this.checkRolePermissions(currentRole);
+        }
+      });
+
+    // 4. Ejecución de permisos inicial (para el estado de carga)
     this.checkRolePermissions(this.cardForm.get('role')?.value);
   }
 }
