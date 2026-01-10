@@ -1,11 +1,13 @@
 import {
   Component,
   computed,
+  effect,
   inject,
   Input,
   input,
   OnInit,
   signal,
+  untracked,
 } from '@angular/core';
 import { IonicElementsModule } from '../../modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from '../../modules/components/components-module';
@@ -13,8 +15,10 @@ import { BackupResponse } from '../../models/backup.model';
 import { HardwareInfo } from '../../models/hardware.model';
 import { Transferencias } from '../../models/trasnsferencias.models';
 import { Servers } from '../../services/servers';
-import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
+import { ViewServices } from '../../services/view-services';
+import { Services } from '../../models/services.models';
 import {
   thumbsUp,
   checkmarkCircle,
@@ -32,7 +36,6 @@ import {
   cloudOfflineOutline,
   informationCircleOutline,
 } from 'ionicons/icons';
-import { ViewServices } from '../../services/view-services';
 
 @Component({
   selector: 'app-cards',
@@ -53,6 +56,7 @@ export class CardsComponent implements OnInit {
   serverData = input<any>();
   selectedTab = signal<string>('Recomendados');
   filterText = signal<string>('');
+  currentServices = signal<Services[]>([]);
 
   DISTRIBUIDORA_ID = input<string>('');
   SERVER_ID = input<string>('');
@@ -80,6 +84,13 @@ export class CardsComponent implements OnInit {
       warningOutline,
       cloudOfflineOutline,
       informationCircleOutline,
+    });
+
+    effect(() => {
+      const data = this.serverData()?.serviciosRecomendados || [];
+      untracked(() => {
+        this.viewSrv.rawServices.set(data);
+      });
     });
   }
 
@@ -210,6 +221,7 @@ export class CardsComponent implements OnInit {
   totalRecomendados = computed(
     () => this.serverData()?.serviciosRecomendados?.length || 0
   );
+
   totalGeneral = computed(
     () => this.serverData()?.serviciosGeneral?.length || 0
   );

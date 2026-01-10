@@ -1,9 +1,9 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { ModalOptions } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular/standalone';
 import { NgxSpinnerService } from 'ngx-spinner';
-
+import { Services } from '../models/services.models';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +18,10 @@ export class ViewServices {
   public isAdminPanel = signal<boolean>(false);
   public biometricData = signal<boolean>(false);
   public isMobile = signal<boolean>(false);
+
+  public generalStatus = signal<string>('');
+  public rawServices = signal<Services[]>([]);
+  public rawTransfer = signal<string>('');
 
   async presentModal(opts: ModalOptions) {
     const modal = await this.modalController.create(opts);
@@ -55,5 +59,13 @@ export class ViewServices {
   loadingSpinnerHide() {
     this.spinnerService.hide();
   }
+
+  public servicesStatus = computed(() => {
+    const list = this.rawServices();
+    if (list.length === 0) return 0;
+
+    const up = list.filter((s) => s.status === 'RUNNING').length;
+    return Math.round((up / list.length) * 100);
+  });
 
 }

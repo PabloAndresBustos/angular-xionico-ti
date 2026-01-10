@@ -1,6 +1,7 @@
-import { Component, input, model, OnInit } from '@angular/core';
+import { Component, computed, inject, input, model, OnInit } from '@angular/core';
 import { IonicElementsModule } from '../../modules/ionic-elements/ionic-elements-module';
 import { ComponentsModule } from '../../modules/components/components-module';
+import { ViewServices } from '../../services/view-services';
 
 @Component({
   selector: 'app-section',
@@ -10,6 +11,8 @@ import { ComponentsModule } from '../../modules/components/components-module';
 })
 export class SectionComponent  implements OnInit {
 
+  private viewSrv = inject(ViewServices)
+
   title = input.required<string>();
   subTitle = input.required<string>();
   data = input.required<any>();
@@ -18,6 +21,7 @@ export class SectionComponent  implements OnInit {
   status = input.required<boolean>();
   iconName = input.required<string>();
 
+
   onSegmentChange(event: any) {
     const newId = event.detail.value;
     this.selectedServerId.set(newId);
@@ -25,6 +29,30 @@ export class SectionComponent  implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {}
+  updateTime():number{
+    if(this.data().ispProvider === "LIMITED"){
+      return 30 * 60 * 2000;
+    }else{
+      return 30 * 60 * 1000;
+    }
+  }
+
+  serverAlarm = computed(() =>{
+    const firebaseTime = this.data().lastUpdate;
+    const firebaseDate = new Date(firebaseTime);
+    const now = new Date();
+    const MINUTOS = this.updateTime()
+    const alarm = (now.getTime() - firebaseDate.getTime()) >= MINUTOS;
+    return alarm
+  });
+
+  servicesStatus(){
+    return this.viewSrv.servicesStatus();
+  }
+
+
+
+  ngOnInit() {
+  }
 
 }

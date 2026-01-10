@@ -4,7 +4,6 @@
   padding: 2px;
   width: 340px !important;
   height: 32px;
-  margin-right: 32px;
   border: none;
 
   ion-segment-button {
@@ -91,5 +90,9 @@ ion-card {
   ion-item {
     --padding-start: 10px;
     --padding-end: 10px;
+  }
+
+  ion-card-title {
+    width: 50%;
   }
 }
